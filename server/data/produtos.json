@@ -1,0 +1,29 @@
+[
+  {
+    "id": "p5",
+    "nome": "Suco Natural",
+    "descricao": "Copo 500ml, sabores do dia.",
+    "preco": 6.00,
+    "categoria": "Bebidas",
+    "imagem": "",
+    "disponivel": true
+  },
+  {
+    "id": "p6",
+    "nome": "Refrigerante Lata",
+    "descricao": "350ml, gelado.",
+    "preco": 6.50,
+    "categoria": "Bebidas",
+    "imagem": "",
+    "disponivel": true
+  },
+  {
+    "id": "p7",
+    "nome": "Água Mineral",
+    "descricao": "500ml, com ou sem gás.",
+    "preco": 4.00,
+    "categoria": "Bebidas",
+    "imagem": "",
+    "disponivel": true
+  }
+]

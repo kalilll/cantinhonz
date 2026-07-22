@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finalizar pedido — Cantinho NZ</title>
+<link rel="icon" type="image/jpeg" href="img/logo.jpeg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="marca">
+    <img src="img/logo.jpeg" alt="Cantinho NZ" class="logo-marca">
+    <div>
+      <h1>Cantinho NZ</h1>
+      <div class="subtitulo">Finalizar pedido</div>
+    </div>
+  </div>
+  <a href="index.html" style="color:#fffdf8; font-size:14px; text-decoration:underline;">← Voltar ao cardápio</a>
+</header>
+
+<main style="max-width: 560px;">
+  <div id="area-erro"></div>
+
+  <div class="cartao-formulario" style="margin-bottom:20px;" id="resumo-comanda">
+    <h2 style="font-family:var(--fonte-titulo); margin-top:0;">Resumo da comanda</h2>
+    <div id="lista-resumo"></div>
+    <div class="linha-total" id="linha-taxa-entrega" style="display:none; font-size:14px; font-weight:400; margin-top:10px;">
+      <span>Taxa de entrega</span>
+      <span id="valor-taxa-entrega">R$ 0,00</span>
+    </div>
+    <div class="linha-total" style="margin-top:14px; border-top: 2px dashed var(--linha); padding-top: 14px;">
+      <span>Total</span>
+      <span id="resumo-total">R$ 0,00</span>
+    </div>
+  </div>
+
+  <div class="cartao-formulario">
+    <h2 style="font-family:var(--fonte-titulo); margin-top:0;">Dados para entrega</h2>
+    <form id="formulario-checkout">
+      <div class="campo">
+        <label for="nome">Nome completo</label>
+        <input type="text" id="nome" required>
+      </div>
+      <div class="campo">
+        <label for="telefone">Telefone / WhatsApp</label>
+        <input type="tel" id="telefone" placeholder="(83) 90000-0000" required>
+      </div>
+      <div class="campo">
+        <label for="bairro">Bairro</label>
+        <select id="bairro" required></select>
+      </div>
+      <div class="campo">
+        <label for="endereco">Endereço completo</label>
+        <textarea id="endereco" rows="3" placeholder="Rua, número, ponto de referência" required></textarea>
+      </div>
+      <div class="campo">
+        <label for="observacoes">Observações (opcional)</label>
+        <textarea id="observacoes" rows="2" placeholder="Sem cebola, troco para R$ 50, etc."></textarea>
+      </div>
+      <button type="submit" class="botao-primario" id="botao-pagar">Ir para pagamento (Pix / Cartão)</button>
+    </form>
+  </div>
+</main>
+
+<script src="js/carrinho.js"></script>
+<script src="js/checkout.js"></script>
+</body>
+</html>

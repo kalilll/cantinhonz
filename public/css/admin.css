@@ -1,0 +1,145 @@
+.tela-login {
+  max-width: 380px;
+  margin: 80px auto;
+}
+
+.abas-admin {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.abas-admin button {
+  font-family: var(--fonte-ticket);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--branco);
+  border: 1px solid var(--linha);
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.abas-admin button.ativa {
+  background: var(--verde-mata);
+  color: var(--branco);
+  border-color: var(--verde-mata);
+}
+
+.tabela-admin {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--branco);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  overflow: hidden;
+}
+.tabela-admin th, .tabela-admin td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--linha);
+  font-size: 13.5px;
+  vertical-align: top;
+}
+.tabela-admin th {
+  background: var(--papel-escuro);
+  font-family: var(--fonte-ticket);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+.tabela-admin tr:last-child td { border-bottom: none; }
+
+.etiqueta-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: var(--fonte-ticket);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.etiqueta-status.aguardando_pagamento { background: #f5e2c4; color: #8a6410; }
+.etiqueta-status.pago { background: #d9ead9; color: #29622a; }
+.etiqueta-status.em_preparo { background: #d9e6f2; color: #1c4c78; }
+.etiqueta-status.saiu_para_entrega { background: #e6d9f2; color: #5a2c78; }
+.etiqueta-status.entregue { background: #dbdbdb; color: #444; }
+.etiqueta-status.pagamento_recusado { background: #f2d9d9; color: #7a1f1f; }
+
+.botao-icone {
+  background: none;
+  border: 1px solid var(--linha);
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-right: 6px;
+}
+.botao-icone.perigo { border-color: var(--tijolo); color: var(--tijolo); }
+
+.grade-form-produto {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+.grade-form-produto .campo-completo { grid-column: 1 / -1; }
+
+.cabecalho-admin {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+select#filtro-status {
+  width: auto;
+  display: inline-block;
+}
+
+.abas-dias {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 14px 0 18px;
+}
+.aba-dia {
+  font-family: var(--fonte-ticket);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--papel);
+  border: 1px solid var(--linha);
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.aba-dia.ativa {
+  background: var(--verde-mata);
+  color: var(--branco);
+  border-color: var(--verde-mata);
+}
+
+.grupo-semana {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--linha);
+}
+.grupo-semana:last-child { border-bottom: none; }
+.grupo-semana h4 {
+  font-family: var(--fonte-titulo);
+  font-size: 15px;
+  margin: 0 0 10px;
+}
+
+.grade-checkbox-semana {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px 14px;
+}
+
+.check-item-semana {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.check-item-semana input { width: auto; margin: 0; }

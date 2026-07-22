@@ -1,0 +1,65 @@
+{
+  "tamanhos": [
+    { "id": "p", "nome": "Pequena", "preco": 14.90, "ativo": true },
+    { "id": "m", "nome": "Média", "preco": 18.90, "ativo": true },
+    { "id": "g", "nome": "Grande", "preco": 22.90, "ativo": true }
+  ],
+  "grupos": [
+    {
+      "id": "proteinas",
+      "nome": "Proteínas",
+      "tipo": "inclusa",
+      "ativo": true,
+      "limites": { "p": 1, "m": 1, "g": 2 },
+      "itens": [
+        { "id": "bife-acebolado", "nome": "Bife acebolado", "ativo": true, "precoExtra": 6.00 },
+        { "id": "frango-grelhado", "nome": "Frango grelhado", "ativo": true, "precoExtra": 5.00 },
+        { "id": "carne-moida", "nome": "Carne moída", "ativo": true, "precoExtra": 5.00 },
+        { "id": "linguica", "nome": "Linguiça acebolada", "ativo": true, "precoExtra": 5.00 },
+        { "id": "grao-de-bico", "nome": "Grão de bico refogado", "ativo": true, "precoExtra": 4.00 }
+      ]
+    },
+    {
+      "id": "acompanhamentos",
+      "nome": "Acompanhamentos",
+      "tipo": "inclusa",
+      "ativo": true,
+      "limites": { "p": 2, "m": 3, "g": 4 },
+      "itens": [
+        { "id": "arroz-branco", "nome": "Arroz branco", "ativo": true, "precoExtra": 2.00 },
+        { "id": "feijao", "nome": "Feijão", "ativo": true, "precoExtra": 2.00 },
+        { "id": "farofa", "nome": "Farofa", "ativo": true, "precoExtra": 2.00 },
+        { "id": "pure-batata", "nome": "Purê de batata", "ativo": true, "precoExtra": 2.50 },
+        { "id": "macarrao", "nome": "Macarrão alho e óleo", "ativo": true, "precoExtra": 2.50 },
+        { "id": "legumes-salteados", "nome": "Legumes salteados", "ativo": true, "precoExtra": 2.50 },
+        { "id": "arroz-integral", "nome": "Arroz integral", "ativo": true, "precoExtra": 2.00 }
+      ]
+    },
+    {
+      "id": "salada",
+      "nome": "Salada",
+      "tipo": "inclusa",
+      "ativo": true,
+      "limites": { "p": 1, "m": 2, "g": 2 },
+      "itens": [
+        { "id": "alface-tomate", "nome": "Alface e tomate", "ativo": true, "precoExtra": 1.50 },
+        { "id": "couve", "nome": "Couve refogada", "ativo": true, "precoExtra": 1.50 },
+        { "id": "beterraba", "nome": "Beterraba ralada", "ativo": true, "precoExtra": 1.50 },
+        { "id": "repolho", "nome": "Repolho", "ativo": true, "precoExtra": 1.50 }
+      ]
+    },
+    {
+      "id": "adicionais",
+      "nome": "Adicionais",
+      "tipo": "adicional",
+      "ativo": true,
+      "limites": { "p": null, "m": null, "g": null },
+      "itens": [
+        { "id": "bacon", "nome": "Bacon", "precoExtra": 3.00, "ativo": true },
+        { "id": "ovo-extra", "nome": "Ovo extra", "precoExtra": 2.50, "ativo": true },
+        { "id": "queijo", "nome": "Queijo ralado", "precoExtra": 2.50, "ativo": true },
+        { "id": "proteina-extra", "nome": "Porção extra de proteína", "precoExtra": 5.00, "ativo": true }
+      ]
+    }
+  ]
+}

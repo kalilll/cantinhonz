@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel administrativo — Cantinho NZ</title>
+<link rel="icon" type="image/jpeg" href="img/logo.jpeg">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="marca">
+    <img src="img/logo.jpeg" alt="Cantinho NZ" class="logo-marca">
+    <div>
+      <h1>Cantinho NZ</h1>
+      <div class="subtitulo">Painel administrativo</div>
+    </div>
+  </div>
+  <button class="carrinho-botao" id="botao-sair" style="display:none;">Sair</button>
+</header>
+
+<main>
+
+  <!-- Tela de login -->
+  <div class="cartao-formulario tela-login" id="tela-login">
+    <h2 style="font-family:var(--fonte-titulo); margin-top:0;">Entrar</h2>
+    <div id="erro-login"></div>
+    <form id="formulario-login">
+      <div class="campo">
+        <label for="usuario">Usuário</label>
+        <input type="text" id="usuario" required>
+      </div>
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" required>
+      </div>
+      <button type="submit" class="botao-primario">Entrar</button>
+    </form>
+  </div>
+
+  <!-- Painel (aparece após login) -->
+  <div id="painel-admin" style="display:none;">
+    <div class="abas-admin">
+      <button class="ativa" data-aba="pedidos">Pedidos</button>
+      <button data-aba="monte">Monte sua Quentinha</button>
+      <button data-aba="semana">Cardápio da Semana</button>
+      <button data-aba="entrega">Entrega</button>
+      <button data-aba="cardapio">Bebidas e extras</button>
+    </div>
+
+    <!-- Aba: Pedidos -->
+    <section id="secao-pedidos">
+      <div class="cabecalho-admin">
+        <h2 style="font-family:var(--fonte-titulo); margin:0;">Pedidos</h2>
+        <button class="botao-icone" id="botao-atualizar-pedidos">↻ Atualizar</button>
+      </div>
+      <table class="tabela-admin">
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Cliente</th>
+            <th>Itens</th>
+            <th>Total</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="corpo-tabela-pedidos"></tbody>
+      </table>
+    </section>
+
+    <!-- Aba: Monte sua Quentinha -->
+    <section id="secao-monte" style="display:none;">
+      <div class="cabecalho-admin">
+        <h2 style="font-family:var(--fonte-titulo); margin:0;">Tamanhos</h2>
+        <button class="botao-icone" id="botao-novo-tamanho">+ Novo tamanho</button>
+      </div>
+      <table class="tabela-admin" style="margin-bottom:28px;">
+        <thead><tr><th>Nome</th><th>Preço (R$)</th><th>Ativo</th><th></th></tr></thead>
+        <tbody id="corpo-tamanhos"></tbody>
+      </table>
+
+      <div class="cabecalho-admin">
+        <h2 style="font-family:var(--fonte-titulo); margin:0;">Grupos de itens</h2>
+        <button class="botao-icone" id="botao-novo-grupo">+ Novo grupo</button>
+      </div>
+      <div id="lista-grupos"></div>
+
+      <button class="botao-primario" id="botao-salvar-monte" style="width:auto; padding:12px 24px; margin-top:10px;">Salvar alterações</button>
+      <div id="status-salvar-monte" style="margin-top:10px;"></div>
+    </section>
+
+    <!-- Aba: Cardápio da Semana -->
+    <section id="secao-semana" style="display:none;">
+      <div class="cartao-formulario" style="margin-bottom:24px;">
+        <h2 style="font-family:var(--fonte-titulo); margin-top:0;">Padrão da semana</h2>
+        <p style="font-size:13.5px; color:#7a7460; margin-top:-6px;">
+          Marque o que normalmente entra no cardápio em cada dia. Isso vale toda semana,
+          a menos que você cadastre uma substituição para uma data específica (abaixo).
+        </p>
+        <div class="abas-dias" id="abas-dias"></div>
+        <div id="grupos-dia-semana"></div>
+        <button class="botao-primario" id="botao-salvar-dia-semana" style="width:auto; padding:10px 22px; margin-top:14px;">Salvar este dia</button>
+        <div id="status-salvar-dia-semana" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="cartao-formulario">
+        <h2 style="font-family:var(--fonte-titulo); margin-top:0;">Substituição para uma data específica</h2>
+        <p style="font-size:13.5px; color:#7a7460; margin-top:-6px;">
+          Use isto quando, num dia específico, um ou mais itens do padrão da semana
+          vão ser trocados (ex: acabou o frango hoje, ou é feriado e o cardápio muda).
+          O resto da semana continua normal.
+        </p>
+        <div class="campo" style="max-width:220px;">
+          <label for="data-substituicao">Data</label>
+          <input type="date" id="data-substituicao">
+        </div>
+        <div id="aviso-substituicao"></div>
+        <div id="grupos-data-substituicao"></div>
+        <div style="display:flex; gap:10px; margin-top:14px;">
+          <button class="botao-primario" id="botao-salvar-substituicao" style="width:auto; padding:10px 22px;">Salvar substituição desta data</button>
+          <button class="botao-secundario" id="botao-remover-substituicao" style="width:auto; padding:10px 22px; display:none;">Remover substituição (voltar ao padrão)</button>
+        </div>
+        <div id="status-salvar-substituicao" style="margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <!-- Aba: Entrega -->
+    <section id="secao-entrega" style="display:none;">
+      <div class="cabecalho-admin">
+        <h2 style="font-family:var(--fonte-titulo); margin:0;">Bairros e taxa de entrega</h2>
+        <button class="botao-icone" id="botao-novo-bairro">+ Novo bairro</button>
+      </div>
+      <p style="font-size:13.5px; color:#7a7460;">
+        Cadastre os bairros que o restaurante atende e a taxa de entrega de cada um.
+        Se a lista estiver vazia, o checkout não cobra taxa de entrega (e não pede bairro).
+        Um bairro "inativo" some da lista que o cliente vê no checkout.
+      </p>
+      <table class="tabela-admin">
+        <thead><tr><th>Bairro</th><th>Taxa (R$)</th><th>Ativo</th><th></th></tr></thead>
+        <tbody id="corpo-bairros"></tbody>
+      </table>
+      <button class="botao-primario" id="botao-salvar-bairros" style="width:auto; padding:12px 24px; margin-top:16px;">Salvar alterações</button>
+      <div id="status-salvar-bairros" style="margin-top:10px;"></div>
+    </section>
+
+    <!-- Aba: Cardápio -->
+    <section id="secao-cardapio" style="display:none;">
+      <div class="cabecalho-admin">
+        <h2 style="font-family:var(--fonte-titulo); margin:0;">Itens do cardápio</h2>
+        <button class="botao-primario" style="width:auto; padding:10px 18px;" id="botao-novo-produto">+ Novo item</button>
+      </div>
+      <table class="tabela-admin">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Categoria</th>
+            <th>Preço</th>
+            <th>Disponível</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="corpo-tabela-produtos"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <!-- Formulário de produto (modal simples) -->
+  <div class="fundo-escurecido" id="fundo-modal"></div>
+  <div class="cartao-formulario" id="modal-produto" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:480px; max-width:92vw; z-index:60;">
+    <h2 style="font-family:var(--fonte-titulo); margin-top:0;" id="titulo-modal">Novo item</h2>
+    <form id="formulario-produto">
+      <input type="hidden" id="produto-id">
+      <div class="grade-form-produto">
+        <div class="campo campo-completo">
+          <label for="produto-nome">Nome</label>
+          <input type="text" id="produto-nome" required>
+        </div>
+        <div class="campo campo-completo">
+          <label for="produto-descricao">Descrição</label>
+          <textarea id="produto-descricao" rows="2"></textarea>
+        </div>
+        <div class="campo">
+          <label for="produto-preco">Preço (R$)</label>
+          <input type="number" id="produto-preco" step="0.01" min="0" required>
+        </div>
+        <div class="campo">
+          <label for="produto-categoria">Categoria</label>
+          <input type="text" id="produto-categoria" placeholder="Tradicionais, Fit, Bebidas..." required>
+        </div>
+        <div class="campo campo-completo">
+          <label><input type="checkbox" id="produto-disponivel" checked style="width:auto; margin-right:6px;"> Disponível no cardápio</label>
+        </div>
+      </div>
+      <button type="submit" class="botao-primario">Salvar</button>
+      <button type="button" class="botao-secundario" id="botao-cancelar-modal">Cancelar</button>
+    </form>
+  </div>
+
+</main>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

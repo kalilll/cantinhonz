@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cantinho NZ — Cardápio</title>
+<link rel="icon" type="image/jpeg" href="img/logo.jpeg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="marca">
+    <img src="img/logo.jpeg" alt="Cantinho NZ" class="logo-marca">
+    <div>
+      <h1>Cantinho NZ</h1>
+      <div class="subtitulo">Sabor de Casa na Sua Mesa!</div>
+    </div>
+  </div>
+  <button class="carrinho-botao" id="botao-abrir-carrinho">
+    🛒 Comanda
+    <span class="contagem" id="contagem-carrinho">0</span>
+  </button>
+</header>
+
+<main>
+  <div class="hero-monte">
+    <div>
+      <h2>Monte sua quentinha 🍱</h2>
+      <p>Escolha o tamanho, a proteína, os acompanhamentos e a salada do seu jeito.</p>
+    </div>
+    <a href="monte.html" class="botao-primario" style="text-decoration:none; display:inline-block;">Montar agora →</a>
+  </div>
+
+  <h2 style="font-family:var(--fonte-titulo); margin-bottom:6px;">Bebidas e extras</h2>
+  <div class="abas-categorias" id="abas-categorias"></div>
+  <div class="grade-cardapio" id="grade-cardapio">
+    <p style="color:#8c8672">Carregando cardápio...</p>
+  </div>
+</main>
+
+<div class="fundo-escurecido" id="fundo-escurecido"></div>
+
+<aside class="painel-carrinho" id="painel-carrinho" aria-label="Sua comanda">
+  <div class="cabecalho-ticket">
+    <h2>Sua comanda</h2>
+    <button class="fechar" id="botao-fechar-carrinho" aria-label="Fechar comanda">×</button>
+  </div>
+  <div class="lista-itens-carrinho" id="lista-itens-carrinho"></div>
+  <div class="rodape-carrinho">
+    <div class="linha-total">
+      <span>Total</span>
+      <span id="valor-total">R$ 0,00</span>
+    </div>
+    <button class="botao-primario" id="botao-finalizar" disabled>Fechar pedido</button>
+  </div>
+</aside>
+
+<script src="js/carrinho.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

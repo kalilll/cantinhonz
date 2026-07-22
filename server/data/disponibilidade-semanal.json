@@ -1,0 +1,212 @@
+{
+  "domingo": {
+    "proteinas": [
+      "bife-acebolado",
+      "frango-grelhado",
+      "carne-moida",
+      "linguica",
+      "grao-de-bico"
+    ],
+    "acompanhamentos": [
+      "arroz-branco",
+      "feijao",
+      "farofa",
+      "pure-batata",
+      "macarrao",
+      "legumes-salteados",
+      "arroz-integral"
+    ],
+    "salada": [
+      "alface-tomate",
+      "couve",
+      "beterraba",
+      "repolho"
+    ],
+    "adicionais": [
+      "bacon",
+      "ovo-extra",
+      "queijo",
+      "proteina-extra"
+    ]
+  },
+  "segunda": {
+    "proteinas": [
+      "bife-acebolado",
+      "frango-grelhado",
+      "carne-moida",
+      "linguica",
+      "grao-de-bico"
+    ],
+    "acompanhamentos": [
+      "arroz-branco",
+      "feijao",
+      "farofa",
+      "pure-batata",
+      "macarrao",
+      "legumes-salteados",
+      "arroz-integral"
+    ],
+    "salada": [
+      "alface-tomate",
+      "couve",
+      "beterraba",
+      "repolho"
+    ],
+    "adicionais": [
+      "bacon",
+      "ovo-extra",
+      "queijo",
+      "proteina-extra"
+    ]
+  },
+  "terca": {
+    "proteinas": [
+      "bife-acebolado",
+      "frango-grelhado",
+      "carne-moida",
+      "linguica",
+      "grao-de-bico"
+    ],
+    "acompanhamentos": [
+      "arroz-branco",
+      "feijao",
+      "farofa",
+      "pure-batata",
+      "macarrao",
+      "legumes-salteados",
+      "arroz-integral"
+    ],
+    "salada": [
+      "alface-tomate",
+      "couve",
+      "beterraba",
+      "repolho"
+    ],
+    "adicionais": [
+      "bacon",
+      "ovo-extra",
+      "queijo",
+      "proteina-extra"
+    ]
+  },
+  "quarta": {
+    "proteinas": [
+      "bife-acebolado",
+      "frango-grelhado",
+      "carne-moida",
+      "linguica",
+      "grao-de-bico"
+    ],
+    "acompanhamentos": [
+      "arroz-branco",
+      "feijao",
+      "farofa",
+      "pure-batata",
+      "macarrao",
+      "legumes-salteados",
+      "arroz-integral"
+    ],
+    "salada": [
+      "alface-tomate",
+      "couve",
+      "beterraba",
+      "repolho"
+    ],
+    "adicionais": [
+      "bacon",
+      "ovo-extra",
+      "queijo",
+      "proteina-extra"
+    ]
+  },
+  "quinta": {
+    "proteinas": [
+      "bife-acebolado",
+      "frango-grelhado",
+      "carne-moida",
+      "linguica",
+      "grao-de-bico"
+    ],
+    "acompanhamentos": [
+      "arroz-branco",
+      "feijao",
+      "farofa",
+      "pure-batata",
+      "macarrao",
+      "legumes-salteados",
+      "arroz-integral"
+    ],
+    "salada": [
+      "alface-tomate",
+      "couve",
+      "beterraba",
+      "repolho"
+    ],
+    "adicionais": [
+      "bacon",
+      "ovo-extra",
+      "queijo",
+      "proteina-extra"
+    ]
+  },
+  "sexta": {
+    "proteinas": [
+      "bife-acebolado",
+      "frango-grelhado",
+      "carne-moida",
+      "linguica",
+      "grao-de-bico"
+    ],
+    "acompanhamentos": [
+      "arroz-branco",
+      "feijao",
+      "farofa",
+      "pure-batata",
+      "macarrao",
+      "legumes-salteados",
+      "arroz-integral"
+    ],
+    "salada": [
+      "alface-tomate",
+      "couve",
+      "beterraba",
+      "repolho"
+    ],
+    "adicionais": [
+      "bacon",
+      "ovo-extra",
+      "queijo",
+      "proteina-extra"
+    ]
+  },
+  "sabado": {
+    "proteinas": [
+      "bife-acebolado",
+      "frango-grelhado",
+      "carne-moida",
+      "linguica",
+      "grao-de-bico"
+    ],
+    "acompanhamentos": [
+      "arroz-branco",
+      "feijao",
+      "farofa",
+      "pure-batata",
+      "macarrao",
+      "legumes-salteados",
+      "arroz-integral"
+    ],
+    "salada": [
+      "alface-tomate",
+      "couve",
+      "beterraba",
+      "repolho"
+    ],
+    "adicionais": [
+      "bacon",
+      "ovo-extra",
+      "queijo",
+      "proteina-extra"
+    ]
+  }
+}

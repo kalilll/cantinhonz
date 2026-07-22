@@ -1,0 +1,6 @@
+[
+  { "id": "centro", "nome": "Centro", "taxa": 5.00, "ativo": true },
+  { "id": "bessa", "nome": "Bessa", "taxa": 8.00, "ativo": true },
+  { "id": "manaira", "nome": "Manaíra", "taxa": 8.00, "ativo": true },
+  { "id": "tambau", "nome": "Tambaú", "taxa": 7.00, "ativo": true }
+]

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monte sua quentinha — Cantinho NZ</title>
+<link rel="icon" type="image/jpeg" href="img/logo.jpeg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="marca">
+    <img src="img/logo.jpeg" alt="Cantinho NZ" class="logo-marca">
+    <div>
+      <h1>Cantinho NZ</h1>
+      <div class="subtitulo">Monte sua quentinha</div>
+    </div>
+  </div>
+  <button class="carrinho-botao" id="botao-abrir-carrinho">
+    🛒 Comanda
+    <span class="contagem" id="contagem-carrinho">0</span>
+  </button>
+</header>
+
+<main>
+  <a href="index.html" style="display:inline-block; margin-bottom:18px; font-size:14px; color:var(--verde-mata);">← Ver cardápio de bebidas e extras</a>
+
+  <div id="area-erro"></div>
+
+  <h2 style="font-family:var(--fonte-titulo); margin-bottom:6px;">1. Escolha o tamanho</h2>
+  <div class="selecao-tamanho" id="selecao-tamanho"></div>
+
+  <div id="grupos-montagem"></div>
+
+  <div class="barra-total-monte">
+    <div>
+      <div style="font-size:12px; color:#7a7460; font-family:var(--fonte-ticket); text-transform:uppercase;">Total da quentinha</div>
+      <div class="total-monte" id="total-monte">R$ 0,00</div>
+    </div>
+    <button class="botao-primario" id="botao-adicionar-monte" disabled>Adicionar à comanda</button>
+  </div>
+</main>
+
+<div class="fundo-escurecido" id="fundo-escurecido"></div>
+
+<aside class="painel-carrinho" id="painel-carrinho" aria-label="Sua comanda">
+  <div class="cabecalho-ticket">
+    <h2>Sua comanda</h2>
+    <button class="fechar" id="botao-fechar-carrinho" aria-label="Fechar comanda">×</button>
+  </div>
+  <div class="lista-itens-carrinho" id="lista-itens-carrinho"></div>
+  <div class="rodape-carrinho">
+    <div class="linha-total">
+      <span>Total</span>
+      <span id="valor-total">R$ 0,00</span>
+    </div>
+    <button class="botao-primario" id="botao-finalizar" disabled>Fechar pedido</button>
+  </div>
+</aside>
+
+<script src="js/carrinho.js"></script>
+<script src="js/monte.js"></script>
+</body>
+</html>
