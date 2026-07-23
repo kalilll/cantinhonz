@@ -107,6 +107,7 @@ campoBairro.addEventListener("change", renderizarResumo);
 function agendarCalculoFrete() {
   clearTimeout(timeoutCalculoFrete);
   const rua = campoRua.value.trim();
+  const bairro = campoBairro.value.trim();
   const numero = campoNumero.value.trim();
 
   if (rua.length < 3 || !numero) {
@@ -117,15 +118,15 @@ function agendarCalculoFrete() {
   }
 
   statusFreteDistancia.innerHTML = `<span style="color:#8c8672;">Calculando taxa de entrega...</span>`;
-  timeoutCalculoFrete = setTimeout(() => calcularFreteDistancia(rua, numero), 900);
+  timeoutCalculoFrete = setTimeout(() => calcularFreteDistancia(rua, bairro, numero), 900);
 }
-
-async function calcularFreteDistancia(rua, numero) {
+  
+async function calcularFreteDistancia(rua, bairro, numero) {
   try {
     const resp = await fetch("/api/frete/calcular", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ endereco: `${rua}, ${numero}` }),
+      body: JSON.stringify({ endereco: `${rua}, ${bairro}, ${numero}` }),
     });
     const dados = await resp.json();
 
