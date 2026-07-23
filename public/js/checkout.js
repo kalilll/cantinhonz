@@ -12,6 +12,7 @@ const valorTaxaEntrega = document.getElementById("valor-taxa-entrega");
 const statusFreteDistancia = document.getElementById("status-frete-distancia");
 const campoRua = document.getElementById("rua");
 const campoNumero = document.getElementById("numero");
+const campoBairro2 = document.getElementById("bairro2");
 const blocoTroco = document.getElementById("bloco-troco");
 const campoTrocoPara = document.getElementById("troco-para");
 const valorTrocoCalculado = document.getElementById("valor-troco-calculado");
@@ -107,7 +108,7 @@ campoBairro.addEventListener("change", renderizarResumo);
 function agendarCalculoFrete() {
   clearTimeout(timeoutCalculoFrete);
   const rua = campoRua.value.trim();
-  const bairro = campoBairro.value.trim();
+  const bairro2 = campoBairro2.value.trim();
   const numero = campoNumero.value.trim();
 
   if (rua.length < 3 || !numero) {
@@ -118,10 +119,10 @@ function agendarCalculoFrete() {
   }
 
   statusFreteDistancia.innerHTML = `<span style="color:#8c8672;">Calculando taxa de entrega...</span>`;
-  timeoutCalculoFrete = setTimeout(() => calcularFreteDistancia(rua, bairro, numero), 900);
+  timeoutCalculoFrete = setTimeout(() => calcularFreteDistancia(rua, bairro2, numero), 900);
 }
   
-async function calcularFreteDistancia(rua, bairro, numero) {
+async function calcularFreteDistancia(rua, bairro2, numero) {
   try {
     const resp = await fetch("/api/frete/calcular", {
       method: "POST",
@@ -152,6 +153,7 @@ async function calcularFreteDistancia(rua, bairro, numero) {
 
 campoRua.addEventListener("input", agendarCalculoFrete);
 campoNumero.addEventListener("input", agendarCalculoFrete);
+campoBairro2.addEventListener("input", agendarCalculoFrete);
 
 // ---- Forma de pagamento (online x dinheiro) ----
 function atualizarTroco() {
