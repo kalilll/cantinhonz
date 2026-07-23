@@ -42,6 +42,7 @@ function mostrarPainel() {
   carregarProdutos();
   carregarConfigMonte().then(() => inicializarAbaSemana());
   carregarBairros();
+  carregarConfigEntrega();
 }
 
 document.getElementById("formulario-login").addEventListener("submit", async (e) => {
@@ -90,6 +91,16 @@ document.querySelectorAll(".abas-admin button").forEach((btn) => {
 // ---- Pedidos ----
 const OPCOES_STATUS = ["aguardando_pagamento", "pago", "em_preparo", "saiu_para_entrega", "entregue", "pagamento_recusado"];
 
+function formatarPagamento(pedido) {
+  if (pedido.formaPagamento !== "dinheiro") {
+    return "💳 Online";
+  }
+  if (pedido.pagamentoDinheiro?.trocoPara) {
+    return `💵 Dinheiro<br><small>Troco p/ ${formatarPreco(pedido.pagamentoDinheiro.trocoPara)} (troco: ${formatarPreco(pedido.pagamentoDinheiro.troco)})</small>`;
+  }
+  return "💵 Dinheiro<br><small>sem troco</small>";
+}
+
 async function carregarPedidos() {
   const corpo = document.getElementById("corpo-tabela-pedidos");
   try {
@@ -97,16 +108,17 @@ async function carregarPedidos() {
     const pedidos = await resp.json();
 
     if (pedidos.length === 0) {
-      corpo.innerHTML = `<tr><td colspan="5">Nenhum pedido ainda.</td></tr>`;
+      corpo.innerHTML = `<tr><td colspan="6">Nenhum pedido ainda.</td></tr>`;
       return;
     }
 
     corpo.innerHTML = pedidos.map((p) => `
       <tr>
         <td>#${p.id.slice(0, 8)}<br><small>${new Date(p.criadoEm).toLocaleString("pt-BR")}</small></td>
-        <td>${p.cliente.nome}<br><small>${p.cliente.telefone}</small><br><small>${p.cliente.endereco}${p.bairro ? ` — ${p.bairro.nome}` : ""}</small></td>
+        <td>${p.cliente.nome}<br><small>${p.cliente.telefone}</small><br><small>${p.cliente.endereco}${p.bairro ? ` — ${p.bairro.nome}` : ""}${p.frete ? ` — ${p.frete.distanciaKm} km` : ""}</small></td>
         <td>${p.itens.map((i) => `${i.quantidade}× ${i.nome}`).join("<br>")}</td>
         <td>${formatarPreco(p.total)}</td>
+        <td>${formatarPagamento(p)}</td>
         <td>
           <select data-id="${p.id}" class="seletor-status">
             ${OPCOES_STATUS.map((s) => `<option value="${s}" ${s === p.status ? "selected" : ""}>${s.replace(/_/g, " ")}</option>`).join("")}
@@ -308,6 +320,7 @@ function renderizarGruposAdmin() {
         </div>
       ` : ""}
 
+      <div class="tabela-scroll">
       <table class="tabela-admin">
         <thead>
           <tr>
@@ -328,6 +341,7 @@ function renderizarGruposAdmin() {
           `).join("") || `<tr><td colspan="4">Nenhum item cadastrado.</td></tr>`}
         </tbody>
       </table>
+      </div>
       <button class="botao-icone" style="margin-top:10px;" data-item-novo="${gIdx}">+ Novo item</button>
     </div>
   `).join("");
@@ -664,6 +678,74 @@ document.getElementById("botao-salvar-bairros").addEventListener("click", async 
     const dados = await resp.json();
     if (!resp.ok) throw new Error(dados.erro || "Erro ao salvar.");
     statusEl.innerHTML = `<div class="aviso-sucesso">Bairros salvos com sucesso!</div>`;
+    setTimeout(() => { statusEl.innerHTML = ""; }, 3000);
+  } catch (erro) {
+    statusEl.innerHTML = `<div class="aviso-erro">${erro.message}</div>`;
+  }
+});
+
+// ---- Configuração do modo de entrega (bairro x distância) ----
+const secaoBairros = document.getElementById("secao-bairros");
+const configDistanciaEl = document.getElementById("config-distancia");
+
+function mostrarCamposModoEntrega(modo) {
+  configDistanciaEl.style.display = modo === "distancia" ? "block" : "none";
+  secaoBairros.style.display = modo === "distancia" ? "none" : "block";
+}
+
+document.querySelectorAll('input[name="modo-entrega"]').forEach((radio) => {
+  radio.addEventListener("change", () => mostrarCamposModoEntrega(radio.value));
+});
+
+async function carregarConfigEntrega() {
+  try {
+    const resp = await chamarApi("/api/frete/admin");
+    const config = await resp.json();
+
+    document.querySelector(`input[name="modo-entrega"][value="${config.modo}"]`).checked = true;
+    mostrarCamposModoEntrega(config.modo);
+
+    const d = config.distancia || {};
+    document.getElementById("dist-lat").value = d.coordenadasRestaurante?.lat ?? "";
+    document.getElementById("dist-lng").value = d.coordenadasRestaurante?.lng ?? "";
+    document.getElementById("dist-cidade").value = d.cidadeReferencia || "";
+    document.getElementById("dist-taxa-base").value = d.taxaBase ?? 0;
+    document.getElementById("dist-preco-km").value = d.precoPorKm ?? 0;
+    document.getElementById("dist-fator-rota").value = d.fatorRota ?? 1.3;
+    document.getElementById("dist-raio-max").value = d.raioMaximoKm ?? "";
+  } catch {
+    // Se não conseguir carregar, deixa os campos como estão (padrão: modo bairro)
+  }
+}
+
+document.getElementById("botao-salvar-modo-entrega").addEventListener("click", async () => {
+  const statusEl = document.getElementById("status-salvar-modo-entrega");
+  statusEl.innerHTML = "";
+
+  const modo = document.querySelector('input[name="modo-entrega"]:checked')?.value || "bairro";
+  const config = {
+    modo,
+    distancia: {
+      coordenadasRestaurante: {
+        lat: Number(document.getElementById("dist-lat").value),
+        lng: Number(document.getElementById("dist-lng").value),
+      },
+      cidadeReferencia: document.getElementById("dist-cidade").value.trim(),
+      taxaBase: Number(document.getElementById("dist-taxa-base").value) || 0,
+      precoPorKm: Number(document.getElementById("dist-preco-km").value) || 0,
+      fatorRota: Number(document.getElementById("dist-fator-rota").value) || 1,
+      raioMaximoKm: Number(document.getElementById("dist-raio-max").value) || null,
+    },
+  };
+
+  try {
+    const resp = await chamarApi("/api/frete/admin", {
+      method: "PUT",
+      body: JSON.stringify(config),
+    });
+    const dados = await resp.json();
+    if (!resp.ok) throw new Error(dados.erro || "Erro ao salvar.");
+    statusEl.innerHTML = `<div class="aviso-sucesso">Configuração de entrega salva!</div>`;
     setTimeout(() => { statusEl.innerHTML = ""; }, 3000);
   } catch (erro) {
     statusEl.innerHTML = `<div class="aviso-erro">${erro.message}</div>`;

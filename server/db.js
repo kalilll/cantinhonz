@@ -11,6 +11,7 @@ const OPCOES_QUENTINHA_PATH = path.join(__dirname, "data", "opcoes-quentinha.jso
 const DISPONIBILIDADE_SEMANAL_PATH = path.join(__dirname, "data", "disponibilidade-semanal.json");
 const SUBSTITUICOES_PATH = path.join(__dirname, "data", "substituicoes-data.json");
 const BAIRROS_ENTREGA_PATH = path.join(__dirname, "data", "bairros-entrega.json");
+const CONFIG_ENTREGA_PATH = path.join(__dirname, "data", "config-entrega.json");
 
 function lerJSON(caminho) {
   const conteudo = fs.readFileSync(caminho, "utf-8");
@@ -85,6 +86,15 @@ function salvarBairrosEntrega(bairros) {
   escreverJSON(BAIRROS_ENTREGA_PATH, bairros);
 }
 
+// ---- Configuração de entrega (modo bairro ou distância) ----
+function getConfigEntrega() {
+  return lerJSON(CONFIG_ENTREGA_PATH);
+}
+
+function salvarConfigEntrega(config) {
+  escreverJSON(CONFIG_ENTREGA_PATH, config);
+}
+
 module.exports = {
   getProdutos,
   salvarProdutos,
@@ -98,4 +108,6 @@ module.exports = {
   salvarSubstituicoes,
   getBairrosEntrega,
   salvarBairrosEntrega,
+  getConfigEntrega,
+  salvarConfigEntrega,
 };

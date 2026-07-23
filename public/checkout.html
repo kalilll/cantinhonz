@@ -47,18 +47,50 @@
         <label for="telefone">Telefone / WhatsApp</label>
         <input type="tel" id="telefone" placeholder="(83) 90000-0000" required>
       </div>
-      <div class="campo">
+      <div class="campo" id="campo-bairro">
         <label for="bairro">Bairro</label>
         <select id="bairro" required></select>
       </div>
+      <div class="campo" style="display:flex; gap:12px;">
+        <div style="flex:3;">
+          <label for="rua">Rua</label>
+          <input type="text" id="rua" required>
+        </div>
+        <div style="flex:1;">
+          <label for="numero">Número</label>
+          <input type="text" id="numero" required>
+        </div>
+      </div>
+      <div id="status-frete-distancia" style="margin: -8px 0 16px; font-size:13px;"></div>
       <div class="campo">
-        <label for="endereco">Endereço completo</label>
-        <textarea id="endereco" rows="3" placeholder="Rua, número, ponto de referência" required></textarea>
+        <label for="referencia">Ponto de referência (opcional)</label>
+        <input type="text" id="referencia" placeholder="Perto de..., em frente a...">
       </div>
       <div class="campo">
         <label for="observacoes">Observações (opcional)</label>
-        <textarea id="observacoes" rows="2" placeholder="Sem cebola, troco para R$ 50, etc."></textarea>
+        <textarea id="observacoes" rows="2" placeholder="Sem cebola, etc."></textarea>
       </div>
+
+      <div class="campo">
+        <label>Forma de pagamento</label>
+        <div class="opcoes-pagamento">
+          <label class="opcao-pagamento">
+            <input type="radio" name="forma-pagamento" value="online" checked>
+            <span>Pagar agora (Pix / Cartão)</span>
+          </label>
+          <label class="opcao-pagamento">
+            <input type="radio" name="forma-pagamento" value="dinheiro">
+            <span>Pagar em dinheiro na entrega</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="campo" id="bloco-troco" style="display:none;">
+        <label for="troco-para">Precisa de troco? Quanto você tem em mãos</label>
+        <input type="number" id="troco-para" step="0.01" min="0" placeholder="Ex: 50,00">
+        <div id="valor-troco-calculado" style="margin-top:8px; font-family:var(--fonte-ticket); font-size:14px;"></div>
+      </div>
+
       <button type="submit" class="botao-primario" id="botao-pagar">Ir para pagamento (Pix / Cartão)</button>
     </form>
   </div>

@@ -143,3 +143,79 @@ select#filtro-status {
   cursor: pointer;
 }
 .check-item-semana input { width: auto; margin: 0; }
+
+/* Permite rolar a tabela na horizontal em vez de espremer ou vazar da tela */
+.tabela-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--raio);
+}
+.tabela-scroll .tabela-admin {
+  min-width: 560px;
+  border-radius: 0;
+}
+
+/* ---- Ajustes de responsividade para celular ---- */
+@media (max-width: 640px) {
+  .tela-login {
+    margin: 40px auto;
+  }
+
+  .abas-admin {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .abas-admin button {
+    flex: 1 1 auto;
+    padding: 9px 12px;
+    font-size: 11px;
+    text-align: center;
+  }
+
+  .cabecalho-admin {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .cabecalho-admin button {
+    width: 100%;
+  }
+
+  .grade-form-produto {
+    grid-template-columns: 1fr;
+  }
+
+  #modal-produto {
+    width: 94vw !important;
+    padding: 18px !important;
+  }
+
+  .abas-dias {
+    gap: 5px;
+  }
+  .aba-dia {
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+
+  .grade-checkbox-semana {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  #config-distancia .grade-form-produto .campo {
+    margin-bottom: 12px;
+  }
+
+  .opcoes-pagamento {
+    max-width: 100% !important;
+  }
+
+  /* Botões de ação (editar/excluir/remover) ficam empilhados e maiores,
+     mais fáceis de tocar num celular do que lado a lado e pequenos */
+  .botao-icone {
+    display: inline-block;
+    margin: 2px 4px 2px 0;
+    padding: 7px 12px;
+  }
+}

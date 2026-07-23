@@ -40,6 +40,31 @@ gerenciar pratos e acompanhar pedidos.
   lista configurada pelo restaurante, e a taxa correspondente é somada ao total
   automaticamente. Bairros fora da área de entrega simplesmente não aparecem na
   lista.
+- **Endereço em campos separados**: no checkout, o cliente preenche rua, número
+  e um ponto de referência opcional (em vez de um campo de texto único) — fica
+  mais fácil de ler tanto pra vocês quanto pro entregador.
+- **Pagamento em dinheiro na entrega**: além de pagar online (Pix/Cartão), o
+  cliente pode escolher pagar em dinheiro quando o pedido chegar. Se ele
+  informar quanto vai pagar (ex: "tenho uma nota de R$50"), o troco é calculado
+  automaticamente e já aparece pra cozinha e pro entregador nas notificações.
+  Pedidos em dinheiro não passam pelo Mercado Pago — ficam confirmados na hora.
+- **Acompanhamento do pedido em tempo real**: depois de fazer o pedido, o
+  cliente cai numa página com uma linha do tempo visual (pago → em preparo →
+  saiu para entrega → entregue) que **atualiza sozinha** enquanto o pedido está
+  em andamento — não precisa ficar recarregando a página. Um link "📦 Meu
+  pedido" aparece no cardápio pra ele voltar e conferir o status depois, mesmo
+  sem guardar o link original.
+- **Atualizar status pelo Telegram**: as mensagens da cozinha e do entregador
+  vêm com botões (ex: "🍳 Marcar como Em Preparo", "🛵 Marcar Saiu para
+  Entrega", "✅ Marcar como Entregue"). Basta clicar — não precisa abrir o
+  painel admin pra avançar o pedido. O status muda no sistema na hora, e o
+  painel admin reflete a mudança automaticamente.
+- **Taxa de entrega por distância (km)**: além do modo por bairro, dá pra ativar
+  o cálculo automático por distância. O cliente digita rua e número, o sistema
+  geocodifica o endereço (converte em coordenadas, gratuitamente, via
+  OpenStreetMap) e calcula a distância real até o restaurante, cobrando uma
+  taxa fixa + um valor por km. Dá pra definir um raio máximo de entrega — fora
+  dele, o pedido é bloqueado. Veja a seção 6 para configurar.
 - Dados guardados em arquivos JSON simples (`server/data/`) — funciona bem para
   começar; veja a seção "Crescendo" para trocar por um banco de verdade depois.
 
@@ -124,11 +149,17 @@ atualize `PUBLIC_URL` no `.env` com a URL final do site.
    receber os avisos numa conversa diferente, repita o processo pra ele e cole
    o resultado em `TELEGRAM_CHAT_ID_ENTREGA` (se deixar em branco, usa o mesmo
    chat da cozinha).
-4. Reinicie o servidor depois de editar o `.env`.
+4. Reinicie o servidor depois de editar o `.env`. Se `PUBLIC_URL` já estiver
+   configurado (necessário pra publicar o site — veja a seção 4), o servidor
+   registra sozinho o webhook do Telegram ao iniciar, sem precisar de nenhum
+   passo manual extra.
 
 A cozinha recebe um aviso automaticamente assim que um pedido é confirmado como
-pago. O entregador recebe outro aviso (com endereço, telefone e bairro) quando
-você muda o status do pedido para "saiu para entrega" no painel admin.
+pago, com um botão **"🍳 Marcar como Em Preparo"**. Ao clicar, o botão vira
+**"🛵 Marcar Saiu para Entrega"** — clicando nele, o entregador recebe uma nova
+mensagem (com endereço, telefone e bairro) e um botão **"✅ Marcar como
+Entregue"**. Tudo isso atualiza o status no sistema na hora, do mesmo jeito que
+mudar pelo painel admin — os dois ficam sempre sincronizados.
 
 **Dica:** se essas variáveis não estiverem configuradas, o sistema simplesmente
 não envia nada (e registra no log do servidor o que teria sido enviado) — ou
@@ -180,11 +211,46 @@ Passos gerais em qualquer um desses serviços:
     para novos pedidos.
 - Na aba **Bebidas e extras**: adicione, edite ou desative itens de prateleira
   simples (um item "indisponível" some do cardápio público sem precisar excluir).
+- Na aba **Entrega**: escolha o modo de cálculo da taxa (por bairro ou por
+  distância) e configure cada um — veja a seção 6 para os detalhes do modo
+  por distância.
 - Na aba **Pedidos**: veja todos os pedidos com dados do cliente, itens e total.
   Mude o status conforme o andamento (em preparo → saiu para entrega → entregue)
   para manter o controle da cozinha.
 
-## 6. Sobre fotos dos pratos
+## 6. Configurando a taxa de entrega por distância
+
+Se preferir cobrar por km em vez de uma lista fixa de bairros:
+
+1. Acesse `/admin.html` → aba **Entrega** → marque **"Por distância (km)"**.
+2. Preencha os campos:
+   - **Latitude/Longitude do restaurante**: já vêm com as coordenadas que você
+     passou (-5.142849, -42.780193). Só mude se o restaurante mudar de endereço
+     — pode pegar novas coordenadas clicando com o botão direito no local exato
+     no Google Maps.
+   - **Cidade/UF de referência**: preencha com a cidade e estado do restaurante
+     (ex: "Teresina, PI, Brasil"). Isso ajuda o sistema a achar o endereço certo
+     quando o cliente digita só rua e número.
+   - **Taxa fixa base**: um valor cobrado sempre, além do valor por km (pode
+     deixar 0 se não quiser taxa fixa).
+   - **Preço por km**: quanto cobrar por quilômetro de distância.
+   - **Fator de rota**: a distância calculada é "em linha reta", que costuma
+     ser menor que a distância real de rua. Um fator de 1.3 (padrão) aumenta a
+     distância em 30% pra aproximar melhor da distância real percorrida.
+   - **Raio máximo de entrega**: distância além da qual o pedido é recusado
+     automaticamente (endereço fora da área de entrega).
+3. Clique em **Salvar configuração de entrega**.
+
+No checkout, o cliente só precisa digitar rua e número — o sistema calcula a
+distância e mostra a taxa automaticamente, antes mesmo de finalizar o pedido.
+
+**Sobre a precisão:** o cálculo usa geocodificação gratuita (OpenStreetMap/
+Nominatim), que é bem confiável pra a maioria dos endereços urbanos, mas pode
+falhar ou ficar impreciso em endereços muito novos, rurais, ou mal escritos.
+Se isso for um problema recorrente, dá pra trocar por uma API paga como o
+Google Maps Geocoding, que tende a ser mais precisa.
+
+## 7. Sobre fotos dos pratos
 
 O campo "imagem" existe no cadastro de produto, mas por padrão fica em branco
 (o layout já funciona bem só com texto). Se quiser adicionar fotos: hospede as
@@ -192,7 +258,7 @@ imagens em algum serviço (ex: [Cloudinary](https://cloudinary.com), gratuito pa
 uso pequeno) e cole o link da imagem no campo correspondente — o código do
 front-end pode ser ajustado para exibi-las nos cards do cardápio.
 
-## 7. Crescendo (próximos passos sugeridos)
+## 8. Crescendo (próximos passos sugeridos)
 
 - **Banco de dados de verdade**: os dados hoje ficam em `server/data/*.json`.
   Funciona bem para um restaurante começando, mas se o volume de pedidos crescer

@@ -1,0 +1,14 @@
+{
+  "modo": "bairro",
+  "distancia": {
+    "coordenadasRestaurante": {
+      "lat": -5.142849,
+      "lng": -42.780193
+    },
+    "cidadeReferencia": "",
+    "taxaBase": 3,
+    "precoPorKm": 1.5,
+    "fatorRota": 1.3,
+    "raioMaximoKm": 10
+  }
+}

@@ -56,6 +56,7 @@
         <h2 style="font-family:var(--fonte-titulo); margin:0;">Pedidos</h2>
         <button class="botao-icone" id="botao-atualizar-pedidos">↻ Atualizar</button>
       </div>
+      <div class="tabela-scroll">
       <table class="tabela-admin">
         <thead>
           <tr>
@@ -63,11 +64,13 @@
             <th>Cliente</th>
             <th>Itens</th>
             <th>Total</th>
+            <th>Pagamento</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody id="corpo-tabela-pedidos"></tbody>
       </table>
+      </div>
     </section>
 
     <!-- Aba: Monte sua Quentinha -->
@@ -76,10 +79,12 @@
         <h2 style="font-family:var(--fonte-titulo); margin:0;">Tamanhos</h2>
         <button class="botao-icone" id="botao-novo-tamanho">+ Novo tamanho</button>
       </div>
+      <div class="tabela-scroll">
       <table class="tabela-admin" style="margin-bottom:28px;">
         <thead><tr><th>Nome</th><th>Preço (R$)</th><th>Ativo</th><th></th></tr></thead>
         <tbody id="corpo-tamanhos"></tbody>
       </table>
+      </div>
 
       <div class="cabecalho-admin">
         <h2 style="font-family:var(--fonte-titulo); margin:0;">Grupos de itens</h2>
@@ -128,21 +133,82 @@
 
     <!-- Aba: Entrega -->
     <section id="secao-entrega" style="display:none;">
-      <div class="cabecalho-admin">
-        <h2 style="font-family:var(--fonte-titulo); margin:0;">Bairros e taxa de entrega</h2>
-        <button class="botao-icone" id="botao-novo-bairro">+ Novo bairro</button>
+      <div class="cartao-formulario" style="margin-bottom:24px;">
+        <h2 style="font-family:var(--fonte-titulo); margin-top:0;">Como calcular a taxa de entrega</h2>
+        <div class="opcoes-pagamento" style="max-width:420px;">
+          <label class="opcao-pagamento">
+            <input type="radio" name="modo-entrega" value="bairro">
+            <span>Por bairro (lista de bairros com taxas fixas)</span>
+          </label>
+          <label class="opcao-pagamento">
+            <input type="radio" name="modo-entrega" value="distancia">
+            <span>Por distância (km) a partir do endereço do restaurante</span>
+          </label>
+        </div>
+
+        <div id="config-distancia" style="display:none; margin-top:18px;">
+          <p style="font-size:13.5px; color:#7a7460; margin-top:0;">
+            O cliente digita o endereço no checkout, o sistema calcula a distância
+            até o restaurante e cobra a taxa automaticamente. A distância usa uma
+            estimativa em linha reta com um fator de correção pra aproximar da
+            distância real de rua.
+          </p>
+          <div class="grade-form-produto">
+            <div class="campo">
+              <label for="dist-lat">Latitude do restaurante</label>
+              <input type="number" id="dist-lat" step="0.000001">
+            </div>
+            <div class="campo">
+              <label for="dist-lng">Longitude do restaurante</label>
+              <input type="number" id="dist-lng" step="0.000001">
+            </div>
+            <div class="campo campo-completo">
+              <label for="dist-cidade">Cidade/UF de referência (ajuda o cálculo a achar o endereço certo)</label>
+              <input type="text" id="dist-cidade" placeholder="Ex: Teresina, PI, Brasil">
+            </div>
+            <div class="campo">
+              <label for="dist-taxa-base">Taxa fixa base (R$)</label>
+              <input type="number" id="dist-taxa-base" step="0.01" min="0">
+            </div>
+            <div class="campo">
+              <label for="dist-preco-km">Preço por km (R$)</label>
+              <input type="number" id="dist-preco-km" step="0.01" min="0">
+            </div>
+            <div class="campo">
+              <label for="dist-fator-rota">Fator de rota</label>
+              <input type="number" id="dist-fator-rota" step="0.1" min="1">
+            </div>
+            <div class="campo">
+              <label for="dist-raio-max">Raio máximo de entrega (km)</label>
+              <input type="number" id="dist-raio-max" step="0.5" min="0">
+            </div>
+          </div>
+        </div>
+
+        <button class="botao-primario" id="botao-salvar-modo-entrega" style="width:auto; padding:12px 24px; margin-top:10px;">Salvar configuração de entrega</button>
+        <div id="status-salvar-modo-entrega" style="margin-top:10px;"></div>
       </div>
-      <p style="font-size:13.5px; color:#7a7460;">
-        Cadastre os bairros que o restaurante atende e a taxa de entrega de cada um.
-        Se a lista estiver vazia, o checkout não cobra taxa de entrega (e não pede bairro).
-        Um bairro "inativo" some da lista que o cliente vê no checkout.
-      </p>
-      <table class="tabela-admin">
-        <thead><tr><th>Bairro</th><th>Taxa (R$)</th><th>Ativo</th><th></th></tr></thead>
-        <tbody id="corpo-bairros"></tbody>
-      </table>
-      <button class="botao-primario" id="botao-salvar-bairros" style="width:auto; padding:12px 24px; margin-top:16px;">Salvar alterações</button>
-      <div id="status-salvar-bairros" style="margin-top:10px;"></div>
+
+      <div id="secao-bairros">
+        <div class="cabecalho-admin">
+          <h2 style="font-family:var(--fonte-titulo); margin:0;">Bairros e taxa de entrega</h2>
+          <button class="botao-icone" id="botao-novo-bairro">+ Novo bairro</button>
+        </div>
+        <p style="font-size:13.5px; color:#7a7460;">
+          Só é usado se o modo acima estiver em "Por bairro". Cadastre os bairros
+          que o restaurante atende e a taxa de cada um. Se a lista estiver vazia,
+          o checkout não cobra taxa (e não pede bairro). Um bairro "inativo" some
+          da lista que o cliente vê no checkout.
+        </p>
+        <div class="tabela-scroll">
+        <table class="tabela-admin">
+          <thead><tr><th>Bairro</th><th>Taxa (R$)</th><th>Ativo</th><th></th></tr></thead>
+          <tbody id="corpo-bairros"></tbody>
+        </table>
+        </div>
+        <button class="botao-primario" id="botao-salvar-bairros" style="width:auto; padding:12px 24px; margin-top:16px;">Salvar bairros</button>
+        <div id="status-salvar-bairros" style="margin-top:10px;"></div>
+      </div>
     </section>
 
     <!-- Aba: Cardápio -->
@@ -151,6 +217,7 @@
         <h2 style="font-family:var(--fonte-titulo); margin:0;">Itens do cardápio</h2>
         <button class="botao-primario" style="width:auto; padding:10px 18px;" id="botao-novo-produto">+ Novo item</button>
       </div>
+      <div class="tabela-scroll">
       <table class="tabela-admin">
         <thead>
           <tr>
@@ -163,6 +230,7 @@
         </thead>
         <tbody id="corpo-tabela-produtos"></tbody>
       </table>
+      </div>
     </section>
   </div>
 

@@ -5,7 +5,9 @@ const db = require("../db");
 const { exigirAdmin } = require("../middleware/auth");
 const { validarECalcularMonte, ErroValidacaoMonte } = require("../monteQuentinha");
 const { calcularDisponibilidadeEm } = require("../disponibilidadeHoje");
-const { notificarCozinha, notificarEntregador } = require("../notificacoes");
+const { notificarCozinha } = require("../notificacoes");
+const { calcularFretePorEndereco, ErroGeocodificacao } = require("../distancia");
+const { atualizarStatusPedido, ErroStatusPedido } = require("../pedidosService");
 
 const router = express.Router();
 
@@ -23,9 +25,16 @@ router.post("/", async (req, res) => {
     if (!Array.isArray(itens) || itens.length === 0) {
       return res.status(400).json({ erro: "O carrinho está vazio." });
     }
-    if (!cliente?.nome || !cliente?.telefone || !cliente?.endereco) {
-      return res.status(400).json({ erro: "Nome, telefone e endereço são obrigatórios." });
+    if (!cliente?.nome || !cliente?.telefone || !cliente?.rua || !cliente?.numero) {
+      return res.status(400).json({ erro: "Nome, telefone, rua e número são obrigatórios." });
     }
+
+    const formaPagamento = cliente.formaPagamento === "dinheiro" ? "dinheiro" : "online";
+
+    // Monta o endereço completo a partir dos campos separados (rua, número,
+    // ponto de referência opcional) — fica assim mais fácil de ler no painel
+    // e nas notificações, sem perder a informação de cada parte.
+    const endereco = `${cliente.rua}, ${cliente.numero}` + (cliente.referencia ? ` — ${cliente.referencia}` : "");
 
     const produtos = db.getProdutos();
     const opcoesQuentinha = db.getOpcoesQuentinha();
@@ -35,14 +44,41 @@ router.post("/", async (req, res) => {
       db.getSubstituicoes()
     );
 
-    // Taxa de entrega por bairro: o cliente escolhe o bairro no checkout, mas
-    // o valor cobrado sempre vem da configuração do servidor, nunca do front-end.
+    // Taxa de entrega: pode ser por bairro (lista fixa) ou por distância (km),
+    // dependendo do que estiver configurado no admin. O valor cobrado sempre
+    // vem calculado aqui no servidor, nunca do front-end.
+    const configEntrega = db.getConfigEntrega();
     let bairro = null;
-    const bairrosAtivos = db.getBairrosEntrega().filter((b) => b.ativo !== false);
-    if (bairrosAtivos.length > 0) {
-      bairro = bairrosAtivos.find((b) => b.id === cliente.bairroId);
-      if (!bairro) {
-        return res.status(400).json({ erro: "Selecione um bairro de entrega válido." });
+    let frete = null;
+
+    if (configEntrega.modo === "distancia") {
+      const { cidadeReferencia } = configEntrega.distancia;
+      const enderecoCompleto = `${cliente.rua}, ${cliente.numero}${cidadeReferencia ? ", " + cidadeReferencia : ""}`;
+      try {
+        const resultado = await calcularFretePorEndereco(enderecoCompleto, configEntrega.distancia);
+        if (!resultado.dentroDoRaio) {
+          return res.status(400).json({
+            erro: `Esse endereço está fora da nossa área de entrega (raio de até ${configEntrega.distancia.raioMaximoKm} km).`,
+          });
+        }
+        frete = {
+          tipo: "distancia",
+          distanciaKm: resultado.distanciaKm,
+          taxa: resultado.taxa,
+        };
+      } catch (e) {
+        if (e instanceof ErroGeocodificacao) {
+          return res.status(400).json({ erro: e.message });
+        }
+        throw e;
+      }
+    } else {
+      const bairrosAtivos = db.getBairrosEntrega().filter((b) => b.ativo !== false);
+      if (bairrosAtivos.length > 0) {
+        bairro = bairrosAtivos.find((b) => b.id === cliente.bairroId);
+        if (!bairro) {
+          return res.status(400).json({ erro: "Selecione um bairro de entrega válido." });
+        }
       }
     }
 
@@ -88,21 +124,64 @@ router.post("/", async (req, res) => {
     if (bairro) {
       total += bairro.taxa;
     }
+    if (frete) {
+      total += frete.taxa;
+    }
+    total = Number(total.toFixed(2));
+
+    // Pagamento em dinheiro na entrega: calcula o troco a partir do valor que
+    // o cliente disse que tem em mãos (nunca confia em um "troco" pronto vindo do front).
+    let pagamentoDinheiro = null;
+    if (formaPagamento === "dinheiro") {
+      if (cliente.trocoPara !== undefined && cliente.trocoPara !== null && cliente.trocoPara !== "") {
+        const trocoPara = Number(cliente.trocoPara);
+        if (Number.isNaN(trocoPara) || trocoPara < total) {
+          return res.status(400).json({ erro: "O valor informado para troco é menor que o total do pedido." });
+        }
+        pagamentoDinheiro = { trocoPara, troco: Number((trocoPara - total).toFixed(2)) };
+      } else {
+        pagamentoDinheiro = { trocoPara: null, troco: 0 };
+      }
+    }
 
     const pedidoId = uuid();
     const pedido = {
       id: pedidoId,
       itens: itensPedido,
       bairro: bairro ? { id: bairro.id, nome: bairro.nome, taxa: bairro.taxa } : null,
-      total: Number(total.toFixed(2)),
-      cliente,
-      status: "aguardando_pagamento",
+      frete,
+      total,
+      cliente: {
+        nome: cliente.nome,
+        telefone: cliente.telefone,
+        rua: cliente.rua,
+        numero: cliente.numero,
+        referencia: cliente.referencia || "",
+        endereco,
+        observacoes: cliente.observacoes || "",
+      },
+      formaPagamento,
+      pagamentoDinheiro,
+      // Pedidos em dinheiro não passam por confirmação de pagamento online:
+      // já entram como "pago" (confirmado), liberando direto para a cozinha.
+      status: formaPagamento === "dinheiro" ? "pago" : "aguardando_pagamento",
       criadoEm: new Date().toISOString(),
     };
 
     const pedidos = db.getPedidos();
     pedidos.push(pedido);
     db.salvarPedidos(pedidos);
+
+    // Pedido em dinheiro: não usa o Mercado Pago, já está confirmado.
+    // Avisa a cozinha imediatamente, já que não existe um webhook de pagamento pra isso.
+    if (formaPagamento === "dinheiro") {
+      const referencia = await notificarCozinha(pedido);
+      if (referencia) {
+        pedido.telegram = { cozinha: referencia };
+        db.salvarPedidos(pedidos);
+      }
+      return res.status(201).json({ pedidoId, linkPagamento: null });
+    }
 
     // Cria a preferência de pagamento no Mercado Pago (Checkout Pro).
     // O cliente é redirecionado para "init_point" para pagar com Pix ou cartão.
@@ -117,6 +196,14 @@ router.post("/", async (req, res) => {
         title: `Taxa de entrega — ${bairro.nome}`,
         quantity: 1,
         unit_price: bairro.taxa,
+        currency_id: "BRL",
+      });
+    }
+    if (frete) {
+      itensParaPagamento.push({
+        title: `Taxa de entrega — ${frete.distanciaKm} km`,
+        quantity: 1,
+        unit_price: frete.taxa,
         currency_id: "BRL",
       });
     }
@@ -184,7 +271,11 @@ router.post("/webhook", async (req, res) => {
         // Avisa a cozinha só na primeira vez que o pedido vira "pago"
         // (o Mercado Pago pode reenviar a mesma notificação mais de uma vez).
         if (novoStatus === "pago" && statusAnterior !== "pago") {
-          notificarCozinha(pedidos[idx]);
+          const referencia = await notificarCozinha(pedidos[idx]);
+          if (referencia) {
+            pedidos[idx].telegram = { cozinha: referencia };
+            db.salvarPedidos(pedidos);
+          }
         }
       }
     }
@@ -202,23 +293,18 @@ router.get("/", exigirAdmin, (req, res) => {
 });
 
 // Admin: atualiza status do pedido manualmente (ex: "em preparo", "saiu para entrega", "entregue")
-router.put("/:id/status", exigirAdmin, (req, res) => {
+router.put("/:id/status", exigirAdmin, async (req, res) => {
   const { status } = req.body;
-  const pedidos = db.getPedidos();
-  const idx = pedidos.findIndex((p) => p.id === req.params.id);
-
-  if (idx === -1) return res.status(404).json({ erro: "Pedido não encontrado." });
-
-  const statusAnterior = pedidos[idx].status;
-  pedidos[idx].status = status;
-  db.salvarPedidos(pedidos);
-
-  // Avisa o entregador só na primeira vez que o pedido vira "saiu para entrega".
-  if (status === "saiu_para_entrega" && statusAnterior !== "saiu_para_entrega") {
-    notificarEntregador(pedidos[idx]);
+  try {
+    const pedido = await atualizarStatusPedido(req.params.id, status);
+    res.json(pedido);
+  } catch (erro) {
+    if (erro instanceof ErroStatusPedido) {
+      return res.status(erro.message === "Pedido não encontrado." ? 404 : 400).json({ erro: erro.message });
+    }
+    console.error("Erro ao atualizar status do pedido:", erro);
+    res.status(500).json({ erro: "Não foi possível atualizar o status." });
   }
-
-  res.json(pedidos[idx]);
 });
 
 module.exports = router;

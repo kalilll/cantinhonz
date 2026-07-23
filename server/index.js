@@ -9,6 +9,9 @@ const adminRouter = require("./routes/admin");
 const opcoesQuentinhaRouter = require("./routes/opcoesQuentinha");
 const disponibilidadeRouter = require("./routes/disponibilidade");
 const bairrosEntregaRouter = require("./routes/bairrosEntrega");
+const freteRouter = require("./routes/frete");
+const telegramWebhookRouter = require("./routes/telegramWebhook");
+const { configurarWebhookTelegram } = require("./notificacoes");
 
 const app = express();
 
@@ -21,6 +24,8 @@ app.use("/api/admin", adminRouter);
 app.use("/api/opcoes-quentinha", opcoesQuentinhaRouter);
 app.use("/api/disponibilidade", disponibilidadeRouter);
 app.use("/api/bairros-entrega", bairrosEntregaRouter);
+app.use("/api/frete", freteRouter);
+app.use("/api/telegram", telegramWebhookRouter);
 
 // Arquivos do site (cardápio, checkout, painel admin)
 app.use(express.static(path.join(__dirname, "..", "public")));
@@ -28,4 +33,5 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🍱 Servidor rodando em http://localhost:${PORT}`);
+  configurarWebhookTelegram();
 });

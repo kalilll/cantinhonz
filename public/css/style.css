@@ -410,6 +410,117 @@ main {
   margin-bottom: 16px;
 }
 
+.opcoes-pagamento {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.opcao-pagamento {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  padding: 12px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  background: var(--branco);
+}
+.opcao-pagamento:has(input:checked) {
+  border-color: var(--verde-mata);
+  background: #eef3ef;
+}
+.opcao-pagamento input { width: auto; margin: 0; }
+/* ---- Linha do tempo de acompanhamento do pedido ---- */
+.linha-do-tempo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin: 24px 0 20px;
+  position: relative;
+}
+
+.etapa-tempo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  text-align: center;
+}
+
+.etapa-tempo .bolinha {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--branco);
+  border: 2px solid var(--linha);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  z-index: 2;
+  transition: all 0.2s ease;
+}
+
+.etapa-tempo .linha-conectora {
+  position: absolute;
+  top: 15px;
+  left: -50%;
+  width: 100%;
+  height: 2px;
+  background: var(--linha);
+  z-index: 1;
+}
+.etapa-tempo:first-child .linha-conectora { display: none; }
+
+.etapa-tempo .rotulo-etapa {
+  font-size: 11px;
+  margin-top: 8px;
+  color: #8c8672;
+  line-height: 1.3;
+  max-width: 80px;
+}
+
+.etapa-tempo.concluida .bolinha {
+  background: var(--verde-mata);
+  border-color: var(--verde-mata);
+  color: var(--branco);
+}
+.etapa-tempo.concluida .linha-conectora { background: var(--verde-mata); }
+.etapa-tempo.concluida .rotulo-etapa { color: var(--verde-mata); font-weight: 600; }
+
+.etapa-tempo.atual .bolinha {
+  background: var(--tijolo);
+  border-color: var(--tijolo);
+  color: var(--branco);
+  box-shadow: 0 0 0 4px rgba(193, 69, 43, 0.15);
+}
+.etapa-tempo.atual .rotulo-etapa { color: var(--tijolo); font-weight: 700; }
+
+.etapa-tempo.recusado .bolinha {
+  background: var(--tijolo);
+  border-color: var(--tijolo);
+  color: var(--branco);
+}
+
+.aviso-acompanhar {
+  font-size: 12.5px;
+  color: #8c8672;
+  margin-top: 18px;
+  border-top: 1px dashed var(--linha);
+  padding-top: 14px;
+}
+
+.link-acompanhar-pedido {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--branco);
+  text-decoration: underline;
+}
+
 /* Foco visível para navegação por teclado */
 button:focus-visible, a:focus-visible {
   outline: 2px solid var(--tijolo);

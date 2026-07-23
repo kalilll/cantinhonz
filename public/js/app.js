@@ -57,3 +57,14 @@ async function carregarCardapio() {
 }
 
 carregarCardapio();
+
+// Mostra o link "Meu pedido" se o cliente já tiver feito um pedido neste
+// navegador, pra ele conseguir voltar e acompanhar o status quando quiser.
+(function exibirLinkMeuPedido() {
+  const ultimoPedidoId = localStorage.getItem("quentinhas_ultimo_pedido");
+  const link = document.getElementById("link-meu-pedido");
+  if (ultimoPedidoId && link) {
+    link.href = `pedido-confirmado.html?id=${ultimoPedidoId}`;
+    link.style.display = "inline-flex";
+  }
+})();
