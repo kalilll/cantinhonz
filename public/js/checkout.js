@@ -127,7 +127,7 @@ async function calcularFreteDistancia(rua, bairro2, numero) {
     const resp = await fetch("/api/frete/calcular", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ endereco: `${rua}, ${bairro}, ${numero}` }),
+      body: JSON.stringify({ endereco: `${rua}, ${bairro2}, ${numero}` }),
     });
     const dados = await resp.json();
 
@@ -220,6 +220,7 @@ document.getElementById("formulario-checkout").addEventListener("submit", async 
     telefone: document.getElementById("telefone").value.trim(),
     rua: campoRua.value.trim(),
     numero: campoNumero.value.trim(),
+    bairro2: campoBairro2.value.trim(),
     referencia: document.getElementById("referencia").value.trim(),
     observacoes: document.getElementById("observacoes").value.trim(),
     formaPagamento,
