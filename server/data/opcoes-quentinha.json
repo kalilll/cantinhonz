@@ -1,23 +1,8 @@
 {
   "tamanhos": [
-    {
-      "id": "p",
-      "nome": "Pequena",
-      "preco": 14.9,
-      "ativo": true
-    },
-    {
-      "id": "m",
-      "nome": "Média",
-      "preco": 18.9,
-      "ativo": true
-    },
-    {
-      "id": "g",
-      "nome": "Grande",
-      "preco": 22.9,
-      "ativo": true
-    }
+    { "id": "p", "nome": "Pequena", "preco": 14.90, "ativo": true },
+    { "id": "m", "nome": "Média", "preco": 18.90, "ativo": true },
+    { "id": "g", "nome": "Grande", "preco": 22.90, "ativo": true }
   ],
   "grupos": [
     {
@@ -25,126 +10,13 @@
       "nome": "Proteínas",
       "tipo": "inclusa",
       "ativo": true,
-      "limites": {
-        "p": 1,
-        "m": 1,
-        "g": 2
-      },
+      "limites": { "p": 1, "m": 1, "g": 2 },
       "itens": [
-        {
-          "id": "assado-de-panela",
-          "nome": "Assado de Panela",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "bife-acebolado",
-          "nome": "Bife Acebolado",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "bife-ao-molho",
-          "nome": "Bife ao Molho",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "bisteca-suina",
-          "nome": "Bisteca Suína",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "calabresa",
-          "nome": "Calabresa",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "carne-na-brasa",
-          "nome": "Carne na Brasa",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "costela-ao-molho",
-          "nome": "Costela ao Molho",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "estrogonofe-de-frango",
-          "nome": "Estrogonofe de Frango",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "figado-acebolado",
-          "nome": "Fígado Acebolado",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "frango-assado",
-          "nome": "Frango Assado",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "galinha",
-          "nome": "Galinha",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "lasanha",
-          "nome": "Lasanha",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "mao-de-vaca",
-          "nome": "Mão de Vaca",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "panelada",
-          "nome": "Panelada",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "panqueca-de-carne",
-          "nome": "Panqueca de Carne",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "panqueca-de-frango",
-          "nome": "Panqueca de Frango",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "peixe-assado",
-          "nome": "Peixe Assado",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "picadinho-de-carne",
-          "nome": "Picadinho de Carne",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "porco-assado",
-          "nome": "Porco Assado",
-          "ativo": true,
-          "precoExtra": 0
-        }
+        { "id": "bife-acebolado", "nome": "Bife acebolado", "ativo": true, "precoExtra": 6.00 },
+        { "id": "frango-grelhado", "nome": "Frango grelhado", "ativo": true, "precoExtra": 5.00 },
+        { "id": "carne-moida", "nome": "Carne moída", "ativo": true, "precoExtra": 5.00 },
+        { "id": "linguica", "nome": "Linguiça acebolada", "ativo": true, "precoExtra": 5.00 },
+        { "id": "grao-de-bico", "nome": "Grão de bico refogado", "ativo": true, "precoExtra": 4.00 }
       ]
     },
     {
@@ -152,42 +24,15 @@
       "nome": "Acompanhamentos",
       "tipo": "inclusa",
       "ativo": true,
-      "limites": {
-        "p": 2,
-        "m": 5,
-        "g": 5
-      },
+      "limites": { "p": 2, "m": 3, "g": 4 },
       "itens": [
-        {
-          "id": "arroz-branco",
-          "nome": "Arroz branco",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "feijao",
-          "nome": "Feijão",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "farofa",
-          "nome": "Farofa",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "pure-batata",
-          "nome": "Purê de batata",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "macarrao",
-          "nome": "Macarrão alho e óleo",
-          "ativo": true,
-          "precoExtra": 0
-        }
+        { "id": "arroz-branco", "nome": "Arroz branco", "ativo": true, "precoExtra": 2.00 },
+        { "id": "feijao", "nome": "Feijão", "ativo": true, "precoExtra": 2.00 },
+        { "id": "farofa", "nome": "Farofa", "ativo": true, "precoExtra": 2.00 },
+        { "id": "pure-batata", "nome": "Purê de batata", "ativo": true, "precoExtra": 2.50 },
+        { "id": "macarrao", "nome": "Macarrão alho e óleo", "ativo": true, "precoExtra": 2.50 },
+        { "id": "legumes-salteados", "nome": "Legumes salteados", "ativo": true, "precoExtra": 2.50 },
+        { "id": "arroz-integral", "nome": "Arroz integral", "ativo": true, "precoExtra": 2.00 }
       ]
     },
     {
@@ -195,24 +40,12 @@
       "nome": "Salada",
       "tipo": "inclusa",
       "ativo": true,
-      "limites": {
-        "p": 1,
-        "m": 2,
-        "g": 2
-      },
+      "limites": { "p": 1, "m": 2, "g": 2 },
       "itens": [
-        {
-          "id": "crua",
-          "nome": "Crua",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "cozida",
-          "nome": "Cozida",
-          "ativo": true,
-          "precoExtra": 0
-        }
+        { "id": "alface-tomate", "nome": "Alface e tomate", "ativo": true, "precoExtra": 1.50 },
+        { "id": "couve", "nome": "Couve refogada", "ativo": true, "precoExtra": 1.50 },
+        { "id": "beterraba", "nome": "Beterraba ralada", "ativo": true, "precoExtra": 1.50 },
+        { "id": "repolho", "nome": "Repolho", "ativo": true, "precoExtra": 1.50 }
       ]
     },
     {
@@ -220,109 +53,12 @@
       "nome": "Adicionais",
       "tipo": "adicional",
       "ativo": true,
-      "limites": {
-        "p": null,
-        "m": null,
-        "g": null
-      },
+      "limites": { "p": null, "m": null, "g": null },
       "itens": [
-        {
-          "id": "coca-cola-1l",
-          "nome": "Coca-Cola 1L",
-          "ativo": true,
-          "precoExtra": 8
-        },
-        {
-          "id": "fanta-laranja-1l",
-          "nome": "Fanta Laranja 1L",
-          "ativo": true,
-          "precoExtra": 8
-        },
-        {
-          "id": "guarana-antarctica-1l",
-          "nome": "Guaraná Antarctica 1L",
-          "ativo": true,
-          "precoExtra": 8
-        },
-        {
-          "id": "pepsi-1l",
-          "nome": "Pepsi 1L",
-          "ativo": true,
-          "precoExtra": 8
-        },
-        {
-          "id": "coca-cola-lata",
-          "nome": "Coca-Cola Lata",
-          "ativo": true,
-          "precoExtra": 5
-        },
-        {
-          "id": "fanta-laranja-lata",
-          "nome": "Fanta Laranja Lata",
-          "ativo": true,
-          "precoExtra": 5
-        },
-        {
-          "id": "guarana-antarctica-lata",
-          "nome": "Guaraná Antarctica Lata",
-          "ativo": true,
-          "precoExtra": 5
-        },
-        {
-          "id": "pepsi-lata",
-          "nome": "Pepsi Lata",
-          "ativo": true,
-          "precoExtra": 5
-        },
-        {
-          "id": "coca-cola-250ml",
-          "nome": "Coca-Cola 250mL",
-          "ativo": true,
-          "precoExtra": 3
-        },
-        {
-          "id": "fanta-laranja-250ml",
-          "nome": "Fanta Laranja 250mL",
-          "ativo": true,
-          "precoExtra": 3
-        },
-        {
-          "id": "guarana-antarctica-250ml",
-          "nome": "Guaraná Antarctica 250mL",
-          "ativo": true,
-          "precoExtra": 3
-        },
-        {
-          "id": "pepsi-250ml",
-          "nome": "Pepsi 250mL",
-          "ativo": true,
-          "precoExtra": 3
-        }
-      ]
-    },
-    {
-      "id": "talher",
-      "nome": "Deseja Talher?",
-      "tipo": "adicional",
-      "ativo": true,
-      "limites": {
-        "m": 1,
-        "g": 1,
-        "p": 1
-      },
-      "itens": [
-        {
-          "id": "sim",
-          "nome": "Sim",
-          "ativo": true,
-          "precoExtra": 0
-        },
-        {
-          "id": "nao",
-          "nome": "Não",
-          "ativo": true,
-          "precoExtra": 0
-        }
+        { "id": "bacon", "nome": "Bacon", "precoExtra": 3.00, "ativo": true },
+        { "id": "ovo-extra", "nome": "Ovo extra", "precoExtra": 2.50, "ativo": true },
+        { "id": "queijo", "nome": "Queijo ralado", "precoExtra": 2.50, "ativo": true },
+        { "id": "proteina-extra", "nome": "Porção extra de proteína", "precoExtra": 5.00, "ativo": true }
       ]
     }
   ]

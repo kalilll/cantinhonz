@@ -2,10 +2,10 @@
   "modo": "distancia",
   "distancia": {
     "coordenadasRestaurante": {
-      "lat": -5.142899890066941,
-      "lng": -42.780386209487915
+      "lat": -5.142849,
+      "lng": -42.780193
     },
-    "cidadeReferencia": "Chico Cardoso, residential, Teresina, Brazil",
+    "cidadeReferencia": "Teresina, PI, Brasil",
     "taxaBase": 3,
     "precoPorKm": 1.5,
     "fatorRota": 1.3,

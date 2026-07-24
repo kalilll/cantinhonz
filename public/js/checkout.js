@@ -13,6 +13,7 @@ const statusFreteDistancia = document.getElementById("status-frete-distancia");
 const campoRua = document.getElementById("rua");
 const campoNumero = document.getElementById("numero");
 const campoBairro2 = document.getElementById("bairro2");
+const campoBairroTextoWrapper = document.getElementById("campo-bairro-texto");
 const blocoTroco = document.getElementById("bloco-troco");
 const campoTrocoPara = document.getElementById("troco-para");
 const valorTrocoCalculado = document.getElementById("valor-troco-calculado");
@@ -119,15 +120,15 @@ function agendarCalculoFrete() {
   }
 
   statusFreteDistancia.innerHTML = `<span style="color:#8c8672;">Calculando taxa de entrega...</span>`;
-  timeoutCalculoFrete = setTimeout(() => calcularFreteDistancia(rua, bairro2, numero), 900);
+  timeoutCalculoFrete = setTimeout(() => calcularFreteDistancia(rua, numero, bairro2), 900);
 }
   
-async function calcularFreteDistancia(rua, bairro2, numero) {
+async function calcularFreteDistancia(rua, numero, bairro2) {
   try {
     const resp = await fetch("/api/frete/calcular", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ endereco: `${rua}, ${bairro2}, ${numero}` }),
+      body: JSON.stringify({ endereco: `${rua}, ${numero}${bairro2 ? " - " + bairro2 : ""}` }),
     });
     const dados = await resp.json();
 
@@ -194,7 +195,13 @@ async function carregarResumo() {
   if (modoEntrega === "distancia") {
     campoBairroWrapper.style.display = "none";
     campoBairro.required = false;
+
+    campoBairroTextoWrapper.style.display = "block";
+    campoBairro2.required = true;
   } else {
+    campoBairroTextoWrapper.style.display = "none";
+    campoBairro2.required = false;
+
     await carregarBairros();
   }
 
@@ -220,13 +227,15 @@ document.getElementById("formulario-checkout").addEventListener("submit", async 
     telefone: document.getElementById("telefone").value.trim(),
     rua: campoRua.value.trim(),
     numero: campoNumero.value.trim(),
-    bairro2: campoBairro2.value.trim(),
     referencia: document.getElementById("referencia").value.trim(),
     observacoes: document.getElementById("observacoes").value.trim(),
     formaPagamento,
   };
   if (modoEntrega === "bairro" && bairros.length > 0) {
     cliente.bairroId = campoBairro.value;
+  }
+  if (modoEntrega === "distancia") {
+    cliente.bairroTexto = campoBairro2.value.trim();
   }
   if (formaPagamento === "dinheiro" && campoTrocoPara.value) {
     cliente.trocoPara = Number(campoTrocoPara.value);

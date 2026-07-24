@@ -53,7 +53,10 @@ router.post("/", async (req, res) => {
 
     if (configEntrega.modo === "distancia") {
       const { cidadeReferencia } = configEntrega.distancia;
-      const enderecoCompleto = `${cliente.rua}, ${cliente.numero}${cidadeReferencia ? ", " + cidadeReferencia : ""}`;
+      const enderecoCompleto =
+        `${cliente.rua}, ${cliente.numero}` +
+        (cliente.bairroTexto ? ` - ${cliente.bairroTexto}` : "") +
+        (cidadeReferencia ? `, ${cidadeReferencia}` : "");
       try {
         const resultado = await calcularFretePorEndereco(enderecoCompleto, configEntrega.distancia);
         if (!resultado.dentroDoRaio) {
@@ -220,6 +223,13 @@ router.post("/", async (req, res) => {
         },
         auto_return: "approved",
         notification_url: `${process.env.PUBLIC_URL}/api/pedidos/webhook`,
+        // Sem boleto (não faz sentido pra um pedido de entrega rápida) e sem
+        // parcelamento (pedido pequeno, cobrado sempre à vista). Pix, cartão
+        // de crédito e cartão de débito continuam disponíveis normalmente.
+        payment_methods: {
+          excluded_payment_types: [{ id: "ticket" }],
+          installments: 1,
+        },
       },
     });
 

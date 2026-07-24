@@ -26,7 +26,9 @@ router.post("/calcular", async (req, res) => {
   }
 
   try {
-    const resultado = await calcularFretePorEndereco(endereco, config.distancia);
+    const { cidadeReferencia } = config.distancia;
+    const enderecoCompleto = endereco.trim() + (cidadeReferencia ? `, ${cidadeReferencia}` : "");
+    const resultado = await calcularFretePorEndereco(enderecoCompleto, config.distancia);
     res.json(resultado);
   } catch (e) {
     if (e instanceof ErroGeocodificacao) {

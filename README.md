@@ -124,8 +124,23 @@ para o painel administrativo.
 3. Copie o **Access Token de produção** e cole em `MP_ACCESS_TOKEN` no `.env`.
    Enquanto estiver testando, use o **Access Token de teste** (mesma tela) — assim
    você pode simular pagamentos sem usar dinheiro real.
-4. Não é preciso escrever nada a mais: a integração de Pix e cartão já está pronta
-   em `server/routes/pedidos.js`, usando o Checkout Pro do Mercado Pago.
+4. Não é preciso escrever nada a mais: a integração de Pix, cartão de crédito
+   e cartão de débito já está pronta em `server/routes/pedidos.js`, usando o
+   Checkout Pro do Mercado Pago. Boleto e parcelamento já vêm desativados no
+   código (não fazem muito sentido pra um pedido de entrega rápida) — se
+   quiser reativar algum dia, é só mexer no bloco `payment_methods` dentro de
+   `server/routes/pedidos.js`.
+
+**Para o Pix aparecer no checkout**, sua conta do Mercado Pago precisa ter,
+além do Access Token de produção:
+   - Conta com os dados **verificados** (verificação de identidade completa,
+     separada de só ter o token).
+   - Uma **chave Pix cadastrada** na conta (CPF, CNPJ, e-mail, telefone ou
+     chave aleatória — qualquer uma já habilita).
+   - A opção **"Transferência bancária (Pix)"** ativada nas configurações de
+     pagamento da conta.
+
+   Confira tudo isso em: painel do Mercado Pago → Configurações → Pix.
 
 **Importante sobre o webhook:** para o sistema confirmar automaticamente quando
 um cliente paga, o Mercado Pago precisa conseguir acessar a rota
@@ -247,8 +262,13 @@ distância e mostra a taxa automaticamente, antes mesmo de finalizar o pedido.
 **Sobre a precisão:** o cálculo usa geocodificação gratuita (OpenStreetMap/
 Nominatim), que é bem confiável pra a maioria dos endereços urbanos, mas pode
 falhar ou ficar impreciso em endereços muito novos, rurais, ou mal escritos.
-Se isso for um problema recorrente, dá pra trocar por uma API paga como o
-Google Maps Geocoding, que tende a ser mais precisa.
+A busca já é restrita a uma área de ~165km ao redor do restaurante (pra evitar
+que um nome de rua seja confundido com uma cidade de mesmo nome em outro
+estado), e existe uma proteção extra que recusa o cálculo se a distância der
+algo implausível. Se mesmo assim um endereço específico não for bem
+reconhecido, o cliente recebe um aviso pra conferir a rua e o número — se isso
+for um problema recorrente, dá pra trocar por uma API paga como o Google Maps
+Geocoding, que tende a ser mais precisa.
 
 ## 7. Sobre fotos dos pratos
 
