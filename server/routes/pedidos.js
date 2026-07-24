@@ -32,9 +32,15 @@ router.post("/", async (req, res) => {
     const formaPagamento = cliente.formaPagamento === "dinheiro" ? "dinheiro" : "online";
 
     // Monta o endereço completo a partir dos campos separados (rua, número,
-    // ponto de referência opcional) — fica assim mais fácil de ler no painel
-    // e nas notificações, sem perder a informação de cada parte.
-    const endereco = `${cliente.rua}, ${cliente.numero}` + (cliente.referencia ? ` — ${cliente.referencia}` : "");
+    // bairro e ponto de referência opcional) — fica assim mais fácil de ler
+    // no painel e nas notificações, sem perder a informação de cada parte.
+    // Importante: o bairro entra aqui também no modo "distância", já que
+    // nesse modo não existe um objeto `bairro` (só existe no modo de lista
+    // fixa) — sem isso, o endereço enviado pro entregador ficava sem bairro.
+    const endereco =
+      `${cliente.rua}, ${cliente.numero}` +
+      (cliente.bairroTexto ? ` - ${cliente.bairroTexto}` : "") +
+      (cliente.referencia ? ` — ${cliente.referencia}` : "");
 
     const produtos = db.getProdutos();
     const opcoesQuentinha = db.getOpcoesQuentinha();
@@ -159,6 +165,7 @@ router.post("/", async (req, res) => {
         telefone: cliente.telefone,
         rua: cliente.rua,
         numero: cliente.numero,
+        bairroTexto: cliente.bairroTexto || "",
         referencia: cliente.referencia || "",
         endereco,
         observacoes: cliente.observacoes || "",
