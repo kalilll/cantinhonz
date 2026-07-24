@@ -1,18 +1,12 @@
 {
   "domingo": {
     "proteinas": [
-      "bife-acebolado",
       "frango-grelhado",
       "carne-moida",
       "linguica",
       "grao-de-bico"
     ],
     "acompanhamentos": [
-      "arroz-branco",
-      "feijao",
-      "farofa",
-      "pure-batata",
-      "macarrao",
       "legumes-salteados",
       "arroz-integral"
     ],
@@ -27,15 +21,19 @@
       "ovo-extra",
       "queijo",
       "proteina-extra"
-    ]
+    ],
+    "gmrxjk25a": []
   },
   "segunda": {
     "proteinas": [
-      "bife-acebolado",
       "frango-grelhado",
       "carne-moida",
       "linguica",
-      "grao-de-bico"
+      "grao-de-bico",
+      "costela-ao-molho",
+      "frango-assado",
+      "figado-acebolado",
+      "calabresa"
     ],
     "acompanhamentos": [
       "arroz-branco",
@@ -50,22 +48,44 @@
       "alface-tomate",
       "couve",
       "beterraba",
-      "repolho"
+      "repolho",
+      "crua",
+      "cozida"
     ],
     "adicionais": [
       "bacon",
       "ovo-extra",
       "queijo",
-      "proteina-extra"
+      "proteina-extra",
+      "coca-cola-1l",
+      "coca-cola-lata",
+      "coca-cola-250ml",
+      "guarana-antarctica-1l",
+      "guarana-antarctica-lata",
+      "guarana-antarctica-250ml",
+      "fanta-laranja-1l",
+      "fanta-laranja-lata",
+      "fanta-laranja-250ml",
+      "pepsi-1l",
+      "pepsi-lata",
+      "pepsi-250ml"
+    ],
+    "talher": [
+      "sim",
+      "nao"
     ]
   },
   "terca": {
     "proteinas": [
-      "bife-acebolado",
       "frango-grelhado",
       "carne-moida",
       "linguica",
-      "grao-de-bico"
+      "grao-de-bico",
+      "mao-de-vaca",
+      "frango-assado",
+      "bisteca-suina",
+      "panqueca-de-frango",
+      "bife-ao-molho"
     ],
     "acompanhamentos": [
       "arroz-branco",
@@ -80,22 +100,43 @@
       "alface-tomate",
       "couve",
       "beterraba",
-      "repolho"
+      "repolho",
+      "crua",
+      "cozida"
     ],
     "adicionais": [
       "bacon",
       "ovo-extra",
       "queijo",
-      "proteina-extra"
+      "proteina-extra",
+      "coca-cola-1l",
+      "coca-cola-lata",
+      "coca-cola-250ml",
+      "guarana-antarctica-250ml",
+      "guarana-antarctica-lata",
+      "guarana-antarctica-1l",
+      "fanta-laranja-1l",
+      "fanta-laranja-lata",
+      "fanta-laranja-250ml",
+      "pepsi-250ml",
+      "pepsi-lata",
+      "pepsi-1l"
+    ],
+    "talher": [
+      "sim",
+      "nao"
     ]
   },
   "quarta": {
     "proteinas": [
-      "bife-acebolado",
       "frango-grelhado",
       "carne-moida",
       "linguica",
-      "grao-de-bico"
+      "grao-de-bico",
+      "assado-de-panela",
+      "frango-assado",
+      "estrogonofe-de-frango",
+      "lasanha"
     ],
     "acompanhamentos": [
       "arroz-branco",
@@ -110,22 +151,43 @@
       "alface-tomate",
       "couve",
       "beterraba",
-      "repolho"
+      "repolho",
+      "crua",
+      "cozida"
     ],
     "adicionais": [
       "bacon",
       "ovo-extra",
       "queijo",
-      "proteina-extra"
+      "proteina-extra",
+      "coca-cola-1l",
+      "coca-cola-lata",
+      "coca-cola-250ml",
+      "guarana-antarctica-lata",
+      "guarana-antarctica-1l",
+      "guarana-antarctica-250ml",
+      "fanta-laranja-1l",
+      "fanta-laranja-lata",
+      "fanta-laranja-250ml",
+      "pepsi-250ml",
+      "pepsi-lata",
+      "pepsi-1l"
+    ],
+    "talher": [
+      "sim",
+      "nao"
     ]
   },
   "quinta": {
     "proteinas": [
-      "bife-acebolado",
       "frango-grelhado",
       "carne-moida",
       "linguica",
-      "grao-de-bico"
+      "grao-de-bico",
+      "carne-na-brasa",
+      "figado-acebolado",
+      "frango-assado",
+      "panelada"
     ],
     "acompanhamentos": [
       "arroz-branco",
@@ -146,16 +208,35 @@
       "bacon",
       "ovo-extra",
       "queijo",
-      "proteina-extra"
+      "proteina-extra",
+      "coca-cola-1l",
+      "fanta-laranja-1l",
+      "guarana-antarctica-1l",
+      "pepsi-1l",
+      "coca-cola-lata",
+      "fanta-laranja-lata",
+      "guarana-antarctica-lata",
+      "pepsi-lata",
+      "coca-cola-250ml",
+      "fanta-laranja-250ml",
+      "guarana-antarctica-250ml",
+      "pepsi-250ml"
+    ],
+    "talher": [
+      "sim",
+      "nao"
     ]
   },
   "sexta": {
     "proteinas": [
-      "bife-acebolado",
       "frango-grelhado",
       "carne-moida",
       "linguica",
-      "grao-de-bico"
+      "grao-de-bico",
+      "frango-assado",
+      "panqueca-de-carne",
+      "peixe-assado",
+      "picadinho-de-carne"
     ],
     "acompanhamentos": [
       "arroz-branco",
@@ -170,22 +251,43 @@
       "alface-tomate",
       "couve",
       "beterraba",
-      "repolho"
+      "repolho",
+      "crua",
+      "cozida"
     ],
     "adicionais": [
       "bacon",
       "ovo-extra",
       "queijo",
-      "proteina-extra"
+      "proteina-extra",
+      "coca-cola-1l",
+      "guarana-antarctica-1l",
+      "fanta-laranja-1l",
+      "pepsi-1l",
+      "coca-cola-lata",
+      "guarana-antarctica-lata",
+      "fanta-laranja-lata",
+      "pepsi-lata",
+      "coca-cola-250ml",
+      "guarana-antarctica-250ml",
+      "fanta-laranja-250ml",
+      "pepsi-250ml"
+    ],
+    "talher": [
+      "sim",
+      "nao"
     ]
   },
   "sabado": {
     "proteinas": [
-      "bife-acebolado",
       "frango-grelhado",
       "carne-moida",
       "linguica",
-      "grao-de-bico"
+      "grao-de-bico",
+      "bife-acebolado",
+      "frango-assado",
+      "galinha",
+      "porco-assado"
     ],
     "acompanhamentos": [
       "arroz-branco",
@@ -200,13 +302,31 @@
       "alface-tomate",
       "couve",
       "beterraba",
-      "repolho"
+      "repolho",
+      "crua",
+      "cozida"
     ],
     "adicionais": [
       "bacon",
       "ovo-extra",
       "queijo",
-      "proteina-extra"
+      "proteina-extra",
+      "coca-cola-1l",
+      "guarana-antarctica-1l",
+      "fanta-laranja-1l",
+      "pepsi-1l",
+      "coca-cola-lata",
+      "guarana-antarctica-lata",
+      "fanta-laranja-lata",
+      "pepsi-lata",
+      "coca-cola-250ml",
+      "guarana-antarctica-250ml",
+      "fanta-laranja-250ml",
+      "pepsi-250ml"
+    ],
+    "talher": [
+      "sim",
+      "nao"
     ]
   }
 }
