@@ -663,6 +663,60 @@ button:focus-visible, a:focus-visible {
 }
 .opcao-item.marcado .marca-check { background: var(--verde-mata); border-color: var(--verde-mata); color: var(--branco); }
 
+/* ---- Stepper de contagem (itens "contáveis" no monte sua quentinha) ---- */
+.opcao-item {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.contador-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--fonte-ticket);
+  margin-left: auto;
+}
+.botao-stepper {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--linha);
+  background: var(--branco);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+}
+.botao-stepper:disabled { opacity: 0.4; cursor: not-allowed; }
+.valor-stepper {
+  min-width: 16px;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* ---- Grupos de escolha única (rádio) ---- */
+.grade-radios-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.opcao-radio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  background: var(--branco);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.opcao-radio input { width: auto; margin: 0; accent-color: var(--verde-mata); }
+.opcao-radio span:first-of-type { flex-grow: 1; }
+.opcao-radio.marcado {
+  border-color: var(--verde-mata);
+  background: #eef3ef;
+}
+
 .barra-total-monte {
   position: sticky;
   bottom: 0;

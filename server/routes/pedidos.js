@@ -111,8 +111,10 @@ router.post("/", async (req, res) => {
         total += resultado.preco * quantidade;
         itensPedido.push({
           nome: resultado.nome,
+          nomeBase: resultado.nomeBase,
           preco: resultado.preco,
           quantidade,
+          ingredientes: resultado.ingredientes,
         });
       } else {
         // Item de prateleira (bebidas, extras avulsos do cardápio)

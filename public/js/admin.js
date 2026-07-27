@@ -302,10 +302,31 @@ function renderizarGruposAdmin() {
             <option value="adicional" ${grupo.tipo === "adicional" ? "selected" : ""}>Adicional pago</option>
           </select>
         </div>
+        <div class="campo" style="flex:1; min-width:180px; margin-bottom:0;">
+          <label>Modo de seleção</label>
+          <select data-grupo-modo="${gIdx}">
+            <option value="multipla" ${grupo.modoSelecao !== "unica" ? "selected" : ""}>Múltipla escolha</option>
+            <option value="unica" ${grupo.modoSelecao === "unica" ? "selected" : ""}>Escolha única (rádio)</option>
+          </select>
+        </div>
         <div class="campo" style="margin-bottom:0;">
           <label><input type="checkbox" ${grupo.ativo !== false ? "checked" : ""} data-grupo-ativo="${gIdx}" style="width:auto; margin-right:6px;">Ativo</label>
         </div>
         <button class="botao-icone perigo" data-grupo-remover="${gIdx}">Remover grupo</button>
+      </div>
+
+      <div style="margin: -6px 0 14px;">
+        ${grupo.modoSelecao === "unica" ? `
+          <label style="font-size:13.5px; display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" ${grupo.obrigatorio ? "checked" : ""} data-grupo-obrigatorio="${gIdx}" style="width:auto;">
+            Obrigatório escolher uma opção (senão, o cliente também pode marcar "Nenhum")
+          </label>
+        ` : `
+          <label style="font-size:13.5px; display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" ${grupo.contavel ? "checked" : ""} data-grupo-contavel="${gIdx}" style="width:auto;">
+            Contável (cliente pode escolher o mesmo item mais de uma vez, com um contador +/-)
+          </label>
+        `}
       </div>
 
       ${grupo.tipo === "inclusa" ? `
@@ -355,6 +376,18 @@ function renderizarGruposAdmin() {
       configMonte.grupos[el.dataset.grupoTipo].tipo = el.value;
       renderizarGruposAdmin();
     });
+  });
+  container.querySelectorAll("[data-grupo-modo]").forEach((el) => {
+    el.addEventListener("change", () => {
+      configMonte.grupos[el.dataset.grupoModo].modoSelecao = el.value;
+      renderizarGruposAdmin();
+    });
+  });
+  container.querySelectorAll("[data-grupo-obrigatorio]").forEach((el) => {
+    el.addEventListener("change", () => { configMonte.grupos[el.dataset.grupoObrigatorio].obrigatorio = el.checked; });
+  });
+  container.querySelectorAll("[data-grupo-contavel]").forEach((el) => {
+    el.addEventListener("change", () => { configMonte.grupos[el.dataset.grupoContavel].contavel = el.checked; });
   });
   container.querySelectorAll("[data-grupo-ativo]").forEach((el) => {
     el.addEventListener("change", () => { configMonte.grupos[el.dataset.grupoAtivo].ativo = el.checked; });
@@ -413,7 +446,7 @@ function renderizarGruposAdmin() {
 
 document.getElementById("botao-novo-grupo").addEventListener("click", () => {
   const id = "g" + Date.now().toString(36);
-  configMonte.grupos.push({ id, nome: "Novo grupo", tipo: "inclusa", ativo: true, limites: {}, itens: [] });
+  configMonte.grupos.push({ id, nome: "Novo grupo", tipo: "inclusa", ativo: true, modoSelecao: "multipla", obrigatorio: false, contavel: false, limites: {}, itens: [] });
   renderizarGruposAdmin();
 });
 

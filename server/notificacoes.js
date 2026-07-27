@@ -109,8 +109,20 @@ async function configurarWebhookTelegram() {
   }
 }
 
+function linhaItem(item) {
+  // Itens de prateleira (bebidas/extras) não têm ingredientes nem nomeBase —
+  // usam o nome normal. Quentinhas montadas usam o nomeBase (só o tamanho,
+  // sem o resumo) no cabeçalho, pra não repetir os ingredientes duas vezes.
+  if (!item.ingredientes || item.ingredientes.length === 0) {
+    return `• ${item.quantidade}× ${item.nome}`;
+  }
+  const cabecalho = `• ${item.quantidade}× ${item.nomeBase || item.nome}`;
+  const linhasIngredientes = item.ingredientes.map((ing) => `   – ${ing}`).join("\n");
+  return `${cabecalho}\n${linhasIngredientes}`;
+}
+
 function textoBase(pedido) {
-  const itens = pedido.itens.map((i) => `• ${i.quantidade}× ${i.nome}`).join("\n");
+  const itens = pedido.itens.map(linhaItem).join("\n");
   return (
     `${itens}\n\n` +
     (pedido.cliente.observacoes ? `📝 Obs: ${pedido.cliente.observacoes}\n\n` : "") +

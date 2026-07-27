@@ -145,7 +145,8 @@
           "ativo": true,
           "precoExtra": 0
         }
-      ]
+      ],
+      "contavel": true
     },
     {
       "id": "acompanhamentos",
@@ -188,7 +189,8 @@
           "ativo": true,
           "precoExtra": 0
         }
-      ]
+      ],
+      "contavel": true
     },
     {
       "id": "salada",
@@ -213,7 +215,8 @@
           "ativo": true,
           "precoExtra": 0
         }
-      ]
+      ],
+      "contavel": true
     },
     {
       "id": "adicionais",
@@ -323,7 +326,9 @@
           "ativo": true,
           "precoExtra": 0
         }
-      ]
+      ],
+      "modoSelecao": "unica",
+      "obrigatorio": true
     }
   ]
 }

@@ -5,7 +5,7 @@
 // Regra de negócio: cada tamanho inclui um número de itens "grátis" por grupo
 // (ex: Média inclui 1 proteína e 3 acompanhamentos). O cliente pode escolher
 // mais itens do que isso — eles não são bloqueados, só passam a cobrar o
-// "precoExtra" próprio do item. Itens de grupos "adicional" (ex: bacon, ovo)
+// "precoExtra" próprio do item. Itens de grupos "adicional"
 // sempre cobram seu precoExtra, pois não têm itens grátis inclusos.
 
 function validarECalcularMonte(escolha, config, disponibilidadeHoje) {
@@ -18,6 +18,7 @@ function validarECalcularMonte(escolha, config, disponibilidadeHoje) {
 
   let total = tamanho.preco;
   const resumoPartes = [];
+  const ingredientes = [];
 
   for (const grupo of config.grupos) {
     if (grupo.ativo === false) continue;
@@ -37,6 +38,15 @@ function validarECalcularMonte(escolha, config, disponibilidadeHoje) {
       return item;
     });
 
+    if (grupo.modoSelecao === "unica") {
+      if (itensEscolhidos.length > 1) {
+        throw new Erro(`Escolha só um item em "${grupo.nome}".`);
+      }
+      if (grupo.obrigatorio && itensEscolhidos.length === 0) {
+        throw new Erro(`Escolha uma opção em "${grupo.nome}".`);
+      }
+    }
+
     if (itensEscolhidos.length === 0) continue;
 
     if (grupo.tipo === "inclusa") {
@@ -46,9 +56,11 @@ function validarECalcularMonte(escolha, config, disponibilidadeHoje) {
       itensEscolhidos.forEach((item, idx) => {
         if (idx < limite) {
           nomes.push(item.nome);
+          ingredientes.push(item.nome);
         } else {
           total += item.precoExtra || 0;
           nomes.push(`${item.nome} (extra)`);
+          ingredientes.push(`${item.nome} (extra)`);
         }
       });
 
@@ -56,16 +68,20 @@ function validarECalcularMonte(escolha, config, disponibilidadeHoje) {
     } else if (grupo.tipo === "adicional") {
       for (const item of itensEscolhidos) {
         total += item.precoExtra || 0;
+        ingredientes.push(`${item.nome} (adicional)`);
       }
       resumoPartes.push(`+ ${itensEscolhidos.map((i) => i.nome).join(", ")}`);
     }
   }
 
-  const nome = `Quentinha ${tamanho.nome}${resumoPartes.length ? " — " + resumoPartes.join("; ") : ""}`;
+  const nomeBase = `Quentinha ${tamanho.nome}`;
+  const nome = `${nomeBase}${resumoPartes.length ? " — " + resumoPartes.join("; ") : ""}`;
 
   return {
     nome,
+    nomeBase,
     preco: Number(total.toFixed(2)),
+    ingredientes,
   };
 }
 
