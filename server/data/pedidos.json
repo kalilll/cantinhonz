@@ -1,3 +1,57 @@
 [
-
+  {
+    "id": "06e0974e-611e-4e25-bc84-c4d85b878865",
+    "itens": [
+      {
+        "id": "p7",
+        "nome": "Água Mineral",
+        "preco": 4,
+        "quantidade": 1
+      }
+    ],
+    "bairro": null,
+    "frete": {
+      "tipo": "distancia",
+      "distanciaKm": 2.51,
+      "taxa": 6.76
+    },
+    "total": 10.76,
+    "localizacao": {
+      "lat": -5.1265919,
+      "lng": -42.774064,
+      "enderecoEncontrado": "R. Macedônia, 5507 - Redenção, Teresina - PI, 64031-220, Brasil"
+    },
+    "linkMapa": "https://www.google.com/maps/dir/?api=1&destination=-5.1265919,-42.774064",
+    "cliente": {
+      "nome": "Kalil",
+      "telefone": "86981458975",
+      "cep": "64031-220",
+      "rua": "Rua Macedônia",
+      "numero": "5507",
+      "complemento": "",
+      "bairroTexto": "Bela Vista",
+      "cidade": "Teresina",
+      "uf": "PI",
+      "referencia": "",
+      "endereco": "Rua Macedônia, 5507 - Bela Vista",
+      "observacoes": ""
+    },
+    "formaPagamento": "dinheiro",
+    "pagamentoDinheiro": {
+      "trocoPara": 15,
+      "troco": 4.24
+    },
+    "status": "saiu_para_entrega",
+    "criadoEm": "2026-10-01T22:20:40.183Z",
+    "telegram": {
+      "cozinha": {
+        "chatId": 8561914673,
+        "messageId": 79
+      },
+      "entrega": {
+        "chatId": 8561914673,
+        "messageId": 80
+      }
+    }
+  }
 ]

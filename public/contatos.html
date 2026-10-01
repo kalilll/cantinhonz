@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cantinho NZ — Contato</title>
+  <link rel="icon" type="image/jpeg" href="img/logo.jpeg">
+  <!-- Reaproveita as cores/fontes/textura já usadas no resto do site -->
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /*
+      ATENÇÃO — antes de publicar, troque os dois valores abaixo:
+      1) NUMERO_WHATSAPP: número com código do país, sem espaços/símbolos
+         (ex: 5586999998888). É pra ONDE o botão do WhatsApp abre a conversa
+         — pode ser diferente do número que roda o bot do cardápio.
+      2) LINK_CARDAPIO: o endereço do site (ex: https://cantinhonz.com.br)
+      Os dois estão marcados com comentário logo abaixo, nos dois <a>.
+    */
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .pagina-contato {
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .pagina-contato .logo-marca {
+      width: 92px;
+      height: 92px;
+      border-radius: 20%;
+      object-fit: cover;
+      border: 4px solid var(--branco);
+      box-shadow: 0 2px 10px rgba(36,31,27,0.15);
+      margin-bottom: 16px;
+    }
+
+    .pagina-contato h1 {
+      font-family: var(--fonte-titulo);
+      font-size: 28px;
+      margin: 0 0 6px;
+    }
+
+    .pagina-contato .subtitulo {
+      color: var(--tinta);
+      opacity: 0.75;
+      margin: 0 0 28px;
+      font-size: 15px;
+    }
+
+    .botao-contato {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px;
+      margin-bottom: 14px;
+      border-radius: var(--raio);
+      font-family: var(--fonte-corpo);
+      font-weight: 600;
+      font-size: 16px;
+      text-decoration: none;
+      transition: filter 0.15s ease;
+    }
+    .botao-contato:hover { filter: brightness(0.95); }
+    .botao-contato svg { width: 22px; height: 22px; flex-shrink: 0; }
+
+    .botao-whatsapp {
+      background: #25d366;
+      color: #ffffff;
+    }
+
+    .botao-cardapio {
+      background: var(--tijolo);
+      color: var(--branco);
+    }
+
+    .rodape-contato {
+      margin-top: 28px;
+      font-size: 12px;
+      color: var(--tinta);
+      opacity: 0.55;
+    }
+  </style>
+</head>
+<body>
+  <main class="pagina-contato">
+    <img src="img/logo.jpeg" alt="Cantinho NZ" class="logo-marca">
+    <h1>Cantinho NZ</h1>
+    <p class="subtitulo">Quentinhas caseiras — peça pelo site ou fale com a gente no WhatsApp</p>
+
+    <!-- Troque o número abaixo (código do país + DDD + número, só dígitos) -->
+    <a
+      class="botao-contato botao-whatsapp"
+      href="https://wa.me/5586994727311?text=Olá!%20Quero%20fazer%20um%20pedido"
+      target="_blank"
+      rel="noopener"
+    >
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+        <path d="M12.001 2C6.478 2 2 6.477 2 12c0 1.86.505 3.68 1.463 5.267L2 22l4.868-1.437A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12.001 2zm0 18.19a8.17 8.17 0 01-4.166-1.14l-.299-.177-3.11.918.928-3.032-.194-.31A8.172 8.172 0 013.81 12c0-4.518 3.674-8.191 8.191-8.191 4.518 0 8.191 3.673 8.191 8.191 0 4.518-3.673 8.19-8.191 8.19z"/>
+      </svg>
+      Falar no WhatsApp
+    </a>
+
+    <!-- Troque o href abaixo pelo link do site do cardápio -->
+    <a
+      class="botao-contato botao-cardapio"
+      href="https://cantinhonz.onrender.com/"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 3h18v18H3z" opacity="0"/>
+        <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+      </svg>
+      Ver cardápio e pedir
+    </a>
+
+    <p class="rodape-contato">Cantinho NZ · Sabor de casa na sua mesa</p>
+  </main>
+</body>
+</html>

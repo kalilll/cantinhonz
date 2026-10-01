@@ -154,7 +154,16 @@ async function notificarEntregador(pedido) {
     (pedido.bairro ? `\n🏘️ Bairro: ${pedido.bairro.nome} (taxa ${formatarPreco(pedido.bairro.taxa)})` : "") +
     (pedido.frete ? `\n📏 Distância: ${pedido.frete.distanciaKm} km (taxa ${formatarPreco(pedido.frete.taxa)})` : "");
 
-  const botoes = [[{ text: "✅ Marcar como Entregue", callback_data: `entregue:${pedido.id}` }]];
+  const botoes = [];
+  // Link gerado a partir das coordenadas (lat/lng) resolvidas pela Geocoding
+  // API do Google — mais confiável do que o Google Maps reinterpretar o
+  // endereço em texto (que pode ter quadra/lote/conjunto). Se não tivermos
+  // coordenadas (ex: geocodificação falhou), o entregador ainda tem o
+  // endereço em texto acima.
+  if (pedido.linkMapa) {
+    botoes.push([{ text: "🗺️ Abrir no Google Maps", url: pedido.linkMapa }]);
+  }
+  botoes.push([{ text: "✅ Marcar como Entregue", callback_data: `entregue:${pedido.id}` }]);
   return enviarMensagemTelegram(CHAT_ID_ENTREGA, texto, botoes);
 }
 

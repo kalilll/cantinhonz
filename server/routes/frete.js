@@ -1,14 +1,24 @@
 const express = require("express");
 const db = require("../db");
 const { exigirAdmin } = require("../middleware/auth");
-const { calcularFretePorEndereco, ErroGeocodificacao } = require("../distancia");
+const { calcularFretePorEndereco, montarQueryEndereco, ErroGeocodificacao } = require("../distancia");
 
 const router = express.Router();
 
-// Público: diz qual modo de entrega está ativo, pro checkout saber o que mostrar.
+// Público: diz qual modo de entrega está ativo, pro checkout saber o que
+// mostrar — e também expõe dados públicos usados no preenchimento do
+// endereço: a chave do Google Maps restrita ao navegador (pro Places
+// Autocomplete) e a localização do restaurante (pra enviesar as sugestões
+// pra perto dali). Nenhum dos dois é sensível: a chave só funciona a partir
+// do domínio do site (restrição por referrer) e a localização do restaurante
+// já é pública por natureza do negócio.
 router.get("/", (req, res) => {
   const config = db.getConfigEntrega();
-  res.json({ modo: config.modo });
+  res.json({
+    modo: config.modo,
+    googleMapsBrowserKey: process.env.GOOGLE_MAPS_BROWSER_KEY || null,
+    coordenadasRestaurante: config.distancia?.coordenadasRestaurante || null,
+  });
 });
 
 // Público: calcula a taxa de entrega por distância a partir de um endereço em texto.
@@ -20,15 +30,20 @@ router.post("/calcular", async (req, res) => {
     return res.status(400).json({ erro: "O cálculo por distância não está ativado." });
   }
 
-  const { endereco } = req.body;
-  if (!endereco || endereco.trim().length < 5) {
+  const { rua, numero, bairro, cidade, uf } = req.body;
+  if (!rua || !numero || String(rua).trim().length < 3) {
     return res.status(400).json({ erro: "Endereço incompleto." });
   }
 
   try {
     const { cidadeReferencia } = config.distancia;
-    const enderecoCompleto = endereco.trim() + (cidadeReferencia ? `, ${cidadeReferencia}` : "");
-    const resultado = await calcularFretePorEndereco(enderecoCompleto, config.distancia);
+    // Se o CEP informado pelo cliente já trouxe cidade/UF (via ViaCEP), usamos
+    // esses dados — são mais precisos que a cidade de referência genérica do
+    // restaurante. Sem CEP confirmado, caímos de volta na cidade configurada.
+    const enderecoTexto = cidade
+      ? montarQueryEndereco({ rua, numero, bairro, cidade, uf })
+      : montarQueryEndereco({ rua, numero, bairro }) + (cidadeReferencia ? `, ${cidadeReferencia}` : "");
+    const resultado = await calcularFretePorEndereco(enderecoTexto, config.distancia);
     res.json(resultado);
   } catch (e) {
     if (e instanceof ErroGeocodificacao) {

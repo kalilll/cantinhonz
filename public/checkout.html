@@ -46,26 +46,41 @@
       <div class="campo">
         <label for="telefone">Telefone / WhatsApp</label>
         <input type="tel" id="telefone" placeholder="(83) 90000-0000" required>
+        <div id="status-whatsapp-cardapio" style="margin-top:8px; font-size:13px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <input type="checkbox" id="quero-cardapio-whatsapp" style="width:auto;">
+            Quero receber o cardápio do dia no WhatsApp
+          </label>
+        </div>
       </div>
-      <div class="campo" id="campo-bairro">
-        <label for="bairro">Bairro</label>
-        <select id="bairro" required></select>
+      <div class="campo">
+        <label for="cep">CEP</label>
+        <input type="text" id="cep" inputmode="numeric" maxlength="9" placeholder="00000-000">
+        <div id="status-cep" style="margin-top:6px; font-size:13px;"></div>
       </div>
       <div class="campo" style="display:flex; gap:12px;">
         <div style="flex:3;">
           <label for="rua">Rua</label>
-          <input type="text" id="rua" required>
+          <input type="text" id="rua" autocomplete="off" required>
         </div>
         <div style="flex:1;">
           <label for="numero">Número</label>
           <input type="text" id="numero" required>
         </div>
       </div>
+      <div class="campo" id="campo-bairro">
+        <label for="bairro">Bairro</label>
+        <select id="bairro" required></select>
+      </div>
       <div class="campo" id="campo-bairro-texto" style="display:none;">
         <label for="bairro2">Bairro</label>
         <input type="text" id="bairro2">
       </div>
       <div id="status-frete-distancia" style="margin: -8px 0 16px; font-size:13px;"></div>
+      <div class="campo">
+        <label for="complemento">Complemento (opcional)</label>
+        <input type="text" id="complemento" placeholder="Quadra, lote, conjunto, apto, casa...">
+      </div>
       <div class="campo">
         <label for="referencia">Ponto de referência (opcional)</label>
         <input type="text" id="referencia" placeholder="Perto de..., em frente a...">

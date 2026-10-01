@@ -6,8 +6,15 @@ const { exigirAdmin } = require("../middleware/auth");
 const { validarECalcularMonte, ErroValidacaoMonte } = require("../monteQuentinha");
 const { calcularDisponibilidadeEm } = require("../disponibilidadeHoje");
 const { notificarCozinha } = require("../notificacoes");
-const { calcularFretePorEndereco, ErroGeocodificacao } = require("../distancia");
+const {
+  calcularFretePorEndereco,
+  geocodificarEndereco,
+  montarQueryEndereco,
+  gerarLinkGoogleMaps,
+  ErroGeocodificacao,
+} = require("../distancia");
 const { atualizarStatusPedido, ErroStatusPedido } = require("../pedidosService");
+const { adicionarContato } = require("../whatsapp-bot/contatos");
 
 const router = express.Router();
 
@@ -39,6 +46,7 @@ router.post("/", async (req, res) => {
     // fixa) — sem isso, o endereço enviado pro entregador ficava sem bairro.
     const endereco =
       `${cliente.rua}, ${cliente.numero}` +
+      (cliente.complemento ? ` (${cliente.complemento})` : "") +
       (cliente.bairroTexto ? ` - ${cliente.bairroTexto}` : "") +
       (cliente.referencia ? ` — ${cliente.referencia}` : "");
 
@@ -56,15 +64,19 @@ router.post("/", async (req, res) => {
     const configEntrega = db.getConfigEntrega();
     let bairro = null;
     let frete = null;
+    // Coordenadas do endereço do cliente (via Google Geocoding API), usadas
+    // pra gerar um link de Google Maps confiável pro entregador — independe
+    // do modo de cálculo de frete escolhido pelo restaurante.
+    let localizacao = null;
 
     if (configEntrega.modo === "distancia") {
       const { cidadeReferencia } = configEntrega.distancia;
-      const enderecoCompleto =
-        `${cliente.rua}, ${cliente.numero}` +
-        (cliente.bairroTexto ? ` - ${cliente.bairroTexto}` : "") +
-        (cidadeReferencia ? `, ${cidadeReferencia}` : "");
+      const camposEndereco = { rua: cliente.rua, numero: cliente.numero, bairro: cliente.bairroTexto };
+      const origemEndereco = cliente.cidade
+        ? { ...camposEndereco, cidade: cliente.cidade, uf: cliente.uf }
+        : montarQueryEndereco(camposEndereco) + (cidadeReferencia ? `, ${cidadeReferencia}` : "");
       try {
-        const resultado = await calcularFretePorEndereco(enderecoCompleto, configEntrega.distancia);
+        const resultado = await calcularFretePorEndereco(origemEndereco, configEntrega.distancia);
         if (!resultado.dentroDoRaio) {
           return res.status(400).json({
             erro: `Esse endereço está fora da nossa área de entrega (raio de até ${configEntrega.distancia.raioMaximoKm} km).`,
@@ -75,6 +87,7 @@ router.post("/", async (req, res) => {
           distanciaKm: resultado.distanciaKm,
           taxa: resultado.taxa,
         };
+        localizacao = { lat: resultado.lat, lng: resultado.lng, enderecoEncontrado: resultado.enderecoEncontrado };
       } catch (e) {
         if (e instanceof ErroGeocodificacao) {
           return res.status(400).json({ erro: e.message });
@@ -88,6 +101,26 @@ router.post("/", async (req, res) => {
         if (!bairro) {
           return res.status(400).json({ erro: "Selecione um bairro de entrega válido." });
         }
+      }
+
+      // No modo "por bairro" a taxa não depende de geocodificação, mas ainda
+      // tentamos localizar o endereço (best-effort, nunca bloqueia o pedido)
+      // só pra termos coordenadas mais precisas pro link do entregador. Se
+      // falhar, o pedido segue normalmente e o link cai pra busca por texto.
+      try {
+        const { cidadeReferencia, coordenadasRestaurante } = configEntrega.distancia || {};
+        const camposEndereco = {
+          rua: cliente.rua,
+          numero: cliente.numero,
+          bairro: bairro ? bairro.nome : cliente.bairroTexto,
+        };
+        const enderecoTexto = cliente.cidade
+          ? montarQueryEndereco({ ...camposEndereco, cidade: cliente.cidade, uf: cliente.uf })
+          : montarQueryEndereco(camposEndereco) + (cidadeReferencia ? `, ${cidadeReferencia}` : "");
+        const geo = await geocodificarEndereco(enderecoTexto, coordenadasRestaurante);
+        localizacao = { lat: geo.lat, lng: geo.lng, enderecoEncontrado: geo.enderecoEncontrado };
+      } catch (e) {
+        localizacao = null;
       }
     }
 
@@ -162,12 +195,20 @@ router.post("/", async (req, res) => {
       bairro: bairro ? { id: bairro.id, nome: bairro.nome, taxa: bairro.taxa } : null,
       frete,
       total,
+      // Coordenadas do endereço (via Google Geocoding API) e o link pronto do
+      // Google Maps gerado a partir delas — ver `distancia.js` (gerarLinkGoogleMaps).
+      localizacao,
+      linkMapa: localizacao ? gerarLinkGoogleMaps(localizacao.lat, localizacao.lng) : null,
       cliente: {
         nome: cliente.nome,
         telefone: cliente.telefone,
+        cep: cliente.cep || "",
         rua: cliente.rua,
         numero: cliente.numero,
+        complemento: cliente.complemento || "",
         bairroTexto: cliente.bairroTexto || "",
+        cidade: cliente.cidade || "",
+        uf: cliente.uf || "",
         referencia: cliente.referencia || "",
         endereco,
         observacoes: cliente.observacoes || "",
@@ -183,6 +224,18 @@ router.post("/", async (req, res) => {
     const pedidos = db.getPedidos();
     pedidos.push(pedido);
     db.salvarPedidos(pedidos);
+
+    // Cliente marcou "quero receber o cardápio no WhatsApp" no checkout —
+    // inscreve na lista do bot (server/whatsapp-bot/). Best-effort: nunca
+    // impede a criação do pedido se isso falhar (ex: arquivo de contatos
+    // bloqueado momentaneamente por outra escrita).
+    if (cliente.receberCardapioWhatsapp) {
+      try {
+        adicionarContato(cliente.telefone, cliente.nome);
+      } catch (erro) {
+        console.error("[whatsapp-bot] Falha ao inscrever cliente na lista do cardápio:", erro.message);
+      }
+    }
 
     // Pedido em dinheiro: não usa o Mercado Pago, já está confirmado.
     // Avisa a cozinha imediatamente, já que não existe um webhook de pagamento pra isso.

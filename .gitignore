@@ -1,2 +1,10 @@
 node_modules/
 .env
+
+# Sessão do WhatsApp (server/whatsapp-bot) — equivale a estar logado na
+# conta; nunca deve ir pro controle de versão.
+server/whatsapp-bot/auth_info/*
+!server/whatsapp-bot/auth_info/.gitkeep
+
+# Imagem enviada via comando /m — é conteúdo do dia, não um arquivo do projeto.
+server/whatsapp-bot/images/override-hoje.jpg

@@ -14,6 +14,11 @@ const campoRua = document.getElementById("rua");
 const campoNumero = document.getElementById("numero");
 const campoBairro2 = document.getElementById("bairro2");
 const campoBairroTextoWrapper = document.getElementById("campo-bairro-texto");
+const campoCep = document.getElementById("cep");
+const statusCep = document.getElementById("status-cep");
+const campoComplemento = document.getElementById("complemento");
+const campoTelefone = document.getElementById("telefone");
+const statusWhatsappCardapio = document.getElementById("status-whatsapp-cardapio");
 const blocoTroco = document.getElementById("bloco-troco");
 const campoTrocoPara = document.getElementById("troco-para");
 const valorTrocoCalculado = document.getElementById("valor-troco-calculado");
@@ -24,6 +29,16 @@ let modoEntrega = "bairro";
 let freteCalculado = null; // { distanciaKm, taxa, dentroDoRaio } — só usado no modo distância
 let totalAtual = 0;
 let timeoutCalculoFrete = null;
+let timeoutBuscaCep = null;
+let timeoutVerificarWhatsapp = null;
+// true quando o telefone digitado já está na lista do cardápio por
+// WhatsApp — nesse caso não faz sentido mostrar o checkbox de novo.
+let jaInscritoWhatsapp = false;
+// Cidade/UF confirmados (via ViaCEP ou via seleção no Places Autocomplete)
+// para o endereço atual — null se ainda não confirmados, ou se o cliente
+// editou o CEP depois de uma busca anterior. Usado para deixar a
+// geocodificação mais precisa; nunca é obrigatório.
+let dadosLocalizacao = null;
 
 function nomeEPrecoItem(item) {
   if (item.tipo === "monte") {
@@ -105,6 +120,166 @@ async function carregarBairros() {
 
 campoBairro.addEventListener("change", renderizarResumo);
 
+// ---- Busca de endereço por CEP (ViaCEP) ----
+function formatarCep(valor) {
+  const digitos = valor.replace(/\D/g, "").slice(0, 8);
+  return digitos.length > 5 ? `${digitos.slice(0, 5)}-${digitos.slice(5)}` : digitos;
+}
+
+async function buscarEnderecoPorCep(cep) {
+  try {
+    const resp = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const dados = await resp.json();
+
+    if (!resp.ok || dados.erro) {
+      statusCep.innerHTML = `<span style="color:var(--tijolo);">CEP não encontrado — preencha o endereço manualmente.</span>`;
+      return;
+    }
+
+    // Rua e bairro continuam editáveis mesmo depois de preenchidos pelo
+    // ViaCEP — o cliente pode corrigir caso o CEP traga algo levemente
+    // diferente do endereço real (comum em CEPs de condomínios/conjuntos).
+    if (dados.logradouro) campoRua.value = dados.logradouro;
+    const bairroRetornado = dados.bairro || "";
+
+    if (modoEntrega === "distancia") {
+      if (bairroRetornado) campoBairro2.value = bairroRetornado;
+    } else if (bairroRetornado) {
+      // No modo "por bairro" a entrega usa uma lista fixa configurada pelo
+      // restaurante — só selecionamos automaticamente se algum item da lista
+      // corresponder ao bairro retornado; senão o cliente escolhe manualmente.
+      const opcaoCorrespondente = Array.from(campoBairro.options).find((o) =>
+        o.textContent.toLowerCase().startsWith(bairroRetornado.toLowerCase())
+      );
+      if (opcaoCorrespondente) campoBairro.value = opcaoCorrespondente.value;
+    }
+
+    dadosLocalizacao = { cidade: dados.localidade || "", uf: dados.uf || "" };
+    statusCep.innerHTML = `<span style="color:var(--verde-mata);">Endereço encontrado — confira e ajuste se precisar.</span>`;
+    agendarCalculoFrete();
+    renderizarResumo();
+  } catch {
+    statusCep.innerHTML = `<span style="color:var(--tijolo);">Não foi possível buscar o CEP agora — preencha manualmente.</span>`;
+  }
+}
+
+campoCep.addEventListener("input", () => {
+  campoCep.value = formatarCep(campoCep.value);
+  clearTimeout(timeoutBuscaCep);
+  // Qualquer edição no CEP invalida os dados de cidade/UF da busca anterior —
+  // evita associar um CEP novo à cidade de um CEP diferente já digitado antes.
+  dadosLocalizacao = null;
+
+  const digitos = campoCep.value.replace(/\D/g, "");
+  if (digitos.length !== 8) {
+    statusCep.innerHTML = "";
+    return;
+  }
+  statusCep.innerHTML = `<span style="color:#8c8672;">Buscando endereço...</span>`;
+  timeoutBuscaCep = setTimeout(() => buscarEnderecoPorCep(digitos), 500);
+});
+
+// ---- Inscrição no cardápio diário do WhatsApp ----
+// Verifica se o número já está na lista assim que o cliente termina de
+// digitar o telefone — evita mostrar o checkbox pra quem já recebe as
+// mensagens (e evita uma segunda tentativa de inscrição inútil).
+function renderizarCheckboxWhatsapp() {
+  if (jaInscritoWhatsapp) {
+    statusWhatsappCardapio.innerHTML = `<span style="color:var(--verde-mata);">✅ Você já recebe o cardápio diário no WhatsApp.</span>`;
+    return;
+  }
+  statusWhatsappCardapio.innerHTML = `
+    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+      <input type="checkbox" id="quero-cardapio-whatsapp" style="width:auto;">
+      Quero receber o cardápio do dia no WhatsApp
+    </label>
+  `;
+}
+
+async function verificarInscricaoWhatsapp(telefone) {
+  const digitos = telefone.replace(/\D/g, "");
+  if (digitos.length < 10) return;
+  try {
+    const resp = await fetch(`/api/whatsapp-cardapio/verificar?numero=${encodeURIComponent(digitos)}`);
+    const dados = await resp.json();
+    jaInscritoWhatsapp = !!dados.inscrito;
+  } catch {
+    jaInscritoWhatsapp = false; // sem resposta do servidor, assume que não está inscrito
+  }
+  renderizarCheckboxWhatsapp();
+}
+
+campoTelefone.addEventListener("input", () => {
+  clearTimeout(timeoutVerificarWhatsapp);
+  jaInscritoWhatsapp = false;
+  timeoutVerificarWhatsapp = setTimeout(() => verificarInscricaoWhatsapp(campoTelefone.value), 600);
+});
+
+// ---- Sugestões de endereço enquanto digita (Google Places Autocomplete) ----
+// Opcional: só é ativado se o servidor tiver uma chave de navegador
+// configurada (GOOGLE_MAPS_BROWSER_KEY). Sem ela, o campo Rua continua um
+// texto comum — o cliente digita manualmente, com a ajuda do CEP acima.
+function carregarPlacesAutocomplete(chave, coordenadasRestaurante) {
+  if (!chave || window.google?.maps?.places) return;
+
+  window.iniciarAutocompleteEndereco = () => {
+    const autocomplete = new google.maps.places.Autocomplete(campoRua, {
+      componentRestrictions: { country: "br" },
+      fields: ["address_components"],
+      types: ["address"],
+    });
+
+    if (coordenadasRestaurante) {
+      const { lat, lng } = coordenadasRestaurante;
+      const margem = 1.5; // mesma margem usada na geocodificação server-side
+      autocomplete.setBounds(
+        new google.maps.LatLngBounds(
+          { lat: lat - margem, lng: lng - margem },
+          { lat: lat + margem, lng: lng + margem }
+        )
+      );
+    }
+
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      const componentes = place?.address_components || [];
+      const pegar = (tipo, curto) =>
+        componentes.find((c) => c.types.includes(tipo))?.[curto ? "short_name" : "long_name"] || "";
+
+      const rua = pegar("route");
+      const numero = pegar("street_number");
+      const bairroEncontrado = pegar("sublocality_level_1") || pegar("sublocality") || pegar("neighborhood");
+      const cidade = pegar("administrative_area_level_2") || pegar("locality");
+      const uf = pegar("administrative_area_level_1", true);
+      const cep = pegar("postal_code");
+
+      // Rua e bairro continuam editáveis — o cliente pode ajustar depois de
+      // escolher a sugestão, igual já acontece com o preenchimento por CEP.
+      if (rua) campoRua.value = rua;
+      if (numero) campoNumero.value = numero;
+      if (cep) campoCep.value = formatarCep(cep);
+
+      if (modoEntrega === "distancia") {
+        if (bairroEncontrado) campoBairro2.value = bairroEncontrado;
+      } else if (bairroEncontrado) {
+        const opcaoCorrespondente = Array.from(campoBairro.options).find((o) =>
+          o.textContent.toLowerCase().startsWith(bairroEncontrado.toLowerCase())
+        );
+        if (opcaoCorrespondente) campoBairro.value = opcaoCorrespondente.value;
+      }
+
+      if (cidade || uf) dadosLocalizacao = { cidade, uf };
+      agendarCalculoFrete();
+      renderizarResumo();
+    });
+  };
+
+  const script = document.createElement("script");
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(chave)}&libraries=places&language=pt-BR&region=BR&loading=async&callback=iniciarAutocompleteEndereco`;
+  script.async = true;
+  document.head.appendChild(script);
+}
+
 // ---- Modo de entrega por distância (km) ----
 function agendarCalculoFrete() {
   clearTimeout(timeoutCalculoFrete);
@@ -128,7 +303,13 @@ async function calcularFreteDistancia(rua, numero, bairro2) {
     const resp = await fetch("/api/frete/calcular", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ endereco: `${rua}, ${numero}${bairro2 ? " - " + bairro2 : ""}` }),
+      body: JSON.stringify({
+        rua,
+        numero,
+        bairro: bairro2,
+        cidade: dadosLocalizacao?.cidade,
+        uf: dadosLocalizacao?.uf,
+      }),
     });
     const dados = await resp.json();
 
@@ -188,6 +369,7 @@ async function carregarResumo() {
     const resp = await fetch("/api/frete");
     const dados = await resp.json();
     modoEntrega = dados.modo || "bairro";
+    carregarPlacesAutocomplete(dados.googleMapsBrowserKey, dados.coordenadasRestaurante);
   } catch {
     modoEntrega = "bairro";
   }
@@ -225,12 +407,21 @@ document.getElementById("formulario-checkout").addEventListener("submit", async 
   const cliente = {
     nome: document.getElementById("nome").value.trim(),
     telefone: document.getElementById("telefone").value.trim(),
+    cep: campoCep.value.trim(),
     rua: campoRua.value.trim(),
     numero: campoNumero.value.trim(),
+    complemento: campoComplemento.value.trim(),
     referencia: document.getElementById("referencia").value.trim(),
     observacoes: document.getElementById("observacoes").value.trim(),
     formaPagamento,
+    // O checkbox é recriado dinamicamente (ver renderizarCheckboxWhatsapp),
+    // por isso é buscado aqui em vez de usar uma referência guardada no topo.
+    receberCardapioWhatsapp: document.getElementById("quero-cardapio-whatsapp")?.checked || false,
   };
+  if (dadosLocalizacao) {
+    cliente.cidade = dadosLocalizacao.cidade;
+    cliente.uf = dadosLocalizacao.uf;
+  }
   if (modoEntrega === "bairro" && bairros.length > 0) {
     cliente.bairroId = campoBairro.value;
   }

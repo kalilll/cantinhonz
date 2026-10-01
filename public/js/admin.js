@@ -115,7 +115,7 @@ async function carregarPedidos() {
     corpo.innerHTML = pedidos.map((p) => `
       <tr>
         <td>#${p.id.slice(0, 8)}<br><small>${new Date(p.criadoEm).toLocaleString("pt-BR")}</small></td>
-        <td>${p.cliente.nome}<br><small>${p.cliente.telefone}</small><br><small>${p.cliente.endereco}${p.bairro ? ` — ${p.bairro.nome}` : ""}${p.frete ? ` — ${p.frete.distanciaKm} km` : ""}</small></td>
+        <td>${p.cliente.nome}<br><small>${p.cliente.telefone}</small><br><small>${p.cliente.endereco}${p.bairro ? ` — ${p.bairro.nome}` : ""}${p.frete ? ` — ${p.frete.distanciaKm} km` : ""}${p.linkMapa ? ` — <a href="${p.linkMapa}" target="_blank" rel="noopener">mapa</a>` : ""}</small></td>
         <td>${p.itens.map((i) => `${i.quantidade}× ${i.nome}`).join("<br>")}</td>
         <td>${formatarPreco(p.total)}</td>
         <td>${formatarPagamento(p)}</td>
