@@ -25,6 +25,28 @@ const {
   normalizarNumeroWhatsapp,
 } = require('./contatos');
 
+// A lib `libsignal` (dependência interna do Baileys, que implementa o
+// protocolo de criptografia do WhatsApp) loga "Closing session"/"Opening
+// session" direto no console sempre que renegocia a sessão com um contato —
+// é parte normal do protocolo (acontece ao mandar a 1ª mensagem do dia pra
+// alguém, por exemplo) e NÃO indica erro nem afeta a entrega da mensagem.
+// Esse log ignora o `logger: pino({ level: 'silent' })` passado pro
+// makeWASocket abaixo porque é um `console.info`/`console.warn` direto
+// dentro do node_modules/libsignal, não algo configurável pela lib.
+// Filtra só essas 4 mensagens específicas (prefixo exato) — todo o resto de
+// console.info/warn do processo continua passando normal.
+const PREFIXO_LOG_LIBSIGNAL = /^(Closing session|Opening session|Session already (closed|open))/;
+const consoleInfoOriginal = console.info.bind(console);
+const consoleWarnOriginal = console.warn.bind(console);
+console.info = (...args) => {
+  if (typeof args[0] === 'string' && PREFIXO_LOG_LIBSIGNAL.test(args[0])) return;
+  consoleInfoOriginal(...args);
+};
+console.warn = (...args) => {
+  if (typeof args[0] === 'string' && PREFIXO_LOG_LIBSIGNAL.test(args[0])) return;
+  consoleWarnOriginal(...args);
+};
+
 const OWNER_NUMBER = process.env.OWNER_NUMBER;
 const PREVIEW_CRON = process.env.PREVIEW_CRON || '0 9 * * *';
 const TIMEZONE = process.env.TIMEZONE || 'America/Fortaleza';
@@ -32,6 +54,38 @@ const DELAY_MIN = parseInt(process.env.DELAY_MIN_SECONDS || '3', 10) * 1000;
 const DELAY_MAX = parseInt(process.env.DELAY_MAX_SECONDS || '8', 10) * 1000;
 
 const ownerJid = OWNER_NUMBER ? `${OWNER_NUMBER}@s.whatsapp.net` : null;
+
+// Referência pro socket ativo, usada só no encerramento gracioso abaixo.
+let sockAtual = null;
+
+// O Baileys grava a sessão (auth_info/) em disco de forma assíncrona e sem
+// proteção contra escrita cortada no meio (ver useMultiFileAuthState). Se o
+// processo for morto abruptamente (ex: Ctrl+C sem handler, ou kill -9)
+// enquanto uma dessas gravações está em andamento, o arquivo de sessão fica
+// corrompido — e é exatamente isso que causa mensagem "presa" sem decriptar
+// (aparece só 1 confirmação de envio, e "Aguardando mensagem" do outro lado).
+// Por isso, ao receber SIGINT/SIGTERM, fechamos a conexão do WhatsApp e
+// damos um instante pro Baileys terminar de gravar antes de sair de verdade
+// — em vez de deixar o Node matar o processo na hora.
+function registrarEncerramentoGracioso() {
+  let encerrando = false;
+  const encerrar = async (sinal) => {
+    if (encerrando) return;
+    encerrando = true;
+    console.log(`\n[whatsapp-bot] Recebido ${sinal} — encerrando a conexão do WhatsApp com cuidado antes de sair...`);
+    try {
+      sockAtual?.end(undefined); // fecha a conexão sem fazer logout (não invalida a sessão)
+    } catch {
+      // nada a fazer — o processo vai sair de qualquer forma, só queremos
+      // ter dado a chance de fechar limpo
+    }
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    process.exit(0);
+  };
+  process.on('SIGINT', () => encerrar('SIGINT'));
+  process.on('SIGTERM', () => encerrar('SIGTERM'));
+}
+registrarEncerramentoGracioso();
 
 // Estado do dia: qual imagem/legenda vai ser enviada e se ja foi confirmada
 let estadoDoDia = {
@@ -58,6 +112,15 @@ function esperarAleatorio() {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// JID "@lid" do dono. O WhatsApp vem migrando contas pra usar um
+// identificador opaco (Linked ID) em vez do número de telefone em algumas
+// conversas — então uma mensagem do dono pode chegar com
+// remoteJid = "<algumNumero>@lid" em vez de "<OWNER_NUMBER>@s.whatsapp.net",
+// mesmo sendo a mesma pessoa. Resolvido via sock.onWhatsApp (que devolve os
+// dois: `jid` tradicional e `lid`) e usado como alternativa aceita no filtro
+// de "mensagem é do dono" em messages.upsert, abaixo.
+let ownerLid = null;
+
 async function verificarNumeroDono(sock) {
   try {
     const resultado = await sock.onWhatsApp(OWNER_NUMBER);
@@ -70,6 +133,10 @@ async function verificarNumeroDono(sock) {
       return;
     }
     console.log(`[whatsapp-bot] Número do dono confirmado no WhatsApp: ${resultado[0].jid}`);
+    if (resultado[0].lid) {
+      ownerLid = resultado[0].lid.includes('@') ? resultado[0].lid : `${resultado[0].lid}@lid`;
+      console.log(`[whatsapp-bot] LID do dono resolvido: ${ownerLid}`);
+    }
   } catch (erro) {
     console.error('[whatsapp-bot] Não consegui verificar o número do dono:', erro.message);
   }
@@ -99,6 +166,7 @@ async function conectar() {
     auth: state,
     logger: pino({ level: 'silent' }),
   });
+  sockAtual = sock;
 
   sock.ev.on('creds.update', saveCreds);
 
@@ -143,7 +211,20 @@ async function conectar() {
   sock.ev.on('messages.upsert', async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message) return;
-    if (msg.key.remoteJid !== ownerJid) return; // só aceita comando do dono
+
+    const remoteJid = msg.key.remoteJid;
+    let ehDoDono = remoteJid === ownerJid || (!!ownerLid && remoteJid === ownerLid);
+
+    // Fallback: chegou uma mensagem em formato @lid e ainda não tínhamos
+    // resolvido o LID do dono (ex: mensagem chegou muito rápido logo após
+    // conectar, antes de verificarNumeroDono terminar) — tenta resolver
+    // agora, uma vez, antes de decidir ignorar.
+    if (!ehDoDono && remoteJid?.endsWith('@lid') && !ownerLid) {
+      await verificarNumeroDono(sock);
+      ehDoDono = !!ownerLid && remoteJid === ownerLid;
+    }
+
+    if (!ehDoDono) return; // não é o dono — ignora
 
     const ehContatoCompartilhado = !!(msg.message.contactMessage || msg.message.contactsArrayMessage);
     const texto =
@@ -199,10 +280,19 @@ async function enviarPreviaParaDono(sock) {
 // reconstruir a partir do número visível (que pode ter máscara, +, espaços etc).
 function parseVCard(vcard) {
   const linhas = String(vcard || '').split(/\r?\n/);
-  const linhaFN = linhas.find((l) => l.startsWith('FN:'));
-  const nome = linhaFN ? linhaFN.slice(3).trim() : '';
 
-  const linhaTel = linhas.find((l) => l.startsWith('TEL'));
+  // Algumas vCards (comum em contatos salvos no iPhone, ou com um rótulo
+  // customizado tipo "Celular"/"WhatsApp") prefixam a linha com um grupo
+  // ("item1.TEL;...", "item1.FN:...") em vez de "TEL;..."/"FN:..." puro —
+  // por isso não dá pra checar só startsWith('TEL')/startsWith('FN:').
+  const linhaFN = linhas.find((l) => /^(?:item\d+\.)?FN:/i.test(l));
+  const nome = linhaFN ? linhaFN.slice(linhaFN.indexOf(':') + 1).trim() : '';
+
+  // Pode haver mais de uma linha TEL (celular, trabalho, casa...). Prioriza
+  // a que tiver "waid=" — confirma que é o número cadastrado no WhatsApp.
+  const linhasTel = linhas.filter((l) => /^(?:item\d+\.)?TEL/i.test(l));
+  const linhaTel = linhasTel.find((l) => /waid=/.test(l)) || linhasTel[0];
+
   let numero = '';
   if (linhaTel) {
     const waidMatch = linhaTel.match(/waid=(\d+)/);
@@ -269,6 +359,23 @@ async function tratarMensagemDono(sock, msg) {
     msg.message.imageMessage?.caption ||
     '';
   const comando = texto.trim().split(' ')[0].toLowerCase();
+
+  if (comando === '/ver') {
+    // Só inicializa o dia se ainda não tiver nada carregado (ex: primeiro
+    // /ver do dia, ou servidor acabou de subir). Se o dono já trocou a
+    // imagem com /m, estadoDoDia.imagem já está preenchido — chamar
+    // iniciarNovoDia() de novo aqui jogaria esse override fora e voltaria
+    // pra imagem padrão do calendário, que era exatamente o bug.
+    if (!estadoDoDia.imagem) {
+      iniciarNovoDia();
+    }
+    if (!estadoDoDia.imagem) {
+      await sock.sendMessage(ownerJid, { text: 'Sem cardápio pra hoje (domingo) — nada pra mostrar.' });
+      return;
+    }
+    await enviarPreviaParaDono(sock);
+    return;
+  }
 
   if (comando === '/c') {
     const lista = listarContatosTexto();
@@ -344,7 +451,7 @@ async function tratarMensagemDono(sock, msg) {
   }
 
   await sock.sendMessage(ownerJid, {
-    text: 'Comando não reconhecido. Use /c, /s ou /m.',
+    text: 'Comando não reconhecido. Use /c, /s, /m ou /ver.',
   });
 }
 

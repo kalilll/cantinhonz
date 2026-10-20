@@ -746,3 +746,7 @@ button:focus-visible, a:focus-visible {
   .barra-total-monte { flex-direction: column; align-items: stretch; }
   .barra-total-monte .botao-primario { width: 100%; }
 }
+
+/* Se a chave do Google Places for recusada, o widget aplica essa classe com um
+   ícone de erro repetido dentro do input — escondemos o ícone pra não poluir. */
+input.gm-err-autocomplete { background-image: none !important; }

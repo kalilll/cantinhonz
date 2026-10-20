@@ -1,4 +1,14 @@
 [
-  { "numero": "558681458975", "nome": "Cliente Exemplo 1" },
-  { "numero": "5586981458975", "nome": "Cliente Exemplo 2" }
+  {
+    "numero": "5586912345678",
+    "nome": "Joao Pe de Feij'ao"
+  },
+  {
+    "numero": "558681458975",
+    "nome": "kalil"
+  },
+  {
+    "numero": "558688492613",
+    "nome": "Rita"
+  }
 ]

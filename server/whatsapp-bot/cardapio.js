@@ -15,6 +15,7 @@ const LINK_PEDIDO = process.env.PUBLIC_URL || 'https://cantinhonz.onrender.com/'
 
 const CARDAPIO_SEMANA = {
   // 0 = domingo (sem cardapio, restaurante fechado), 1 = segunda, ... 6 = sabado
+  0: { imagem: path.join(IMAGES_DIR, 'domingo.jpeg'), legenda: 'Cardápio de domingo' },
   1: { imagem: path.join(IMAGES_DIR, 'segunda.jpeg'), legenda: 'Cardápio de segunda-feira' },
   2: { imagem: path.join(IMAGES_DIR, 'terca.jpeg'), legenda: 'Cardápio de terça-feira' },
   3: { imagem: path.join(IMAGES_DIR, 'quarta.jpeg'), legenda: 'Cardápio de quarta-feira' },

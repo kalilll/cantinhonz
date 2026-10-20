@@ -1,0 +1,58 @@
+diff --git a/node_modules/@whiskeysockets/baileys/lib/Utils/decode-wa-message.js b/node_modules/@whiskeysockets/baileys/lib/Utils/decode-wa-message.js
+index a3ccfe6..029a03b 100644
+--- a/node_modules/@whiskeysockets/baileys/lib/Utils/decode-wa-message.js
++++ b/node_modules/@whiskeysockets/baileys/lib/Utils/decode-wa-message.js
+@@ -109,6 +109,18 @@ export function decodeMessageNode(stanza, meId, meLid) {
+         sender: msgType === 'chat' ? author : chatId
+     };
+ }
++// Correção do bug "Bad MAC" por descompasso LID/número de telefone — ver
++// https://github.com/WhiskeySockets/Baileys/pull/2763 (ainda não mesclado
++// oficialmente). Quando a sessão foi estabelecida sob um formato de
++// identidade (LID ou número) mas a mensagem chega endereçada pelo outro, a
++// busca de sessão falha mesmo já existindo uma sessão válida pro mesmo
++// dispositivo sob o outro endereço. O WhatsApp já manda os dois formatos
++// junto da mensagem (sender_pn/sender_lid em 1:1, participant_pn/
++// participant_lid em grupo) — usamos isso pra tentar de novo antes de desistir.
++function formaAlternativaDoUsuario(user, key) {
++    const altCandidato = isLidUser(user) ? (key.senderPn || key.participantPn) : (key.senderLid || key.participantLid);
++    return altCandidato && altCandidato !== user ? altCandidato : null;
++}
+ export const decryptMessageNode = (stanza, meId, meLid, repository, logger) => {
+     const { fullMessage, author, sender } = decodeMessageNode(stanza, meId, meLid);
+     return {
+@@ -148,11 +160,29 @@ export const decryptMessageNode = (stanza, meId, meLid, repository, logger) => {
+                             case 'pkmsg':
+                             case 'msg':
+                                 const user = isJidUser(sender) ? sender : author;
+-                                msgBuffer = await repository.decryptMessage({
+-                                    jid: user,
+-                                    type: e2eType,
+-                                    ciphertext: content
+-                                });
++                                try {
++                                    msgBuffer = await repository.decryptMessage({
++                                        jid: user,
++                                        type: e2eType,
++                                        ciphertext: content
++                                    });
++                                }
++                                catch (erroDecrypt) {
++                                    const altUser = formaAlternativaDoUsuario(user, fullMessage.key);
++                                    if (!altUser) {
++                                        throw erroDecrypt;
++                                    }
++                                    try {
++                                        msgBuffer = await repository.decryptMessage({
++                                            jid: altUser,
++                                            type: e2eType,
++                                            ciphertext: content
++                                        });
++                                    }
++                                    catch {
++                                        throw erroDecrypt; // preserva o erro original (mais específico)
++                                    }
++                                }
+                                 break;
+                             case 'plaintext':
+                                 msgBuffer = content;

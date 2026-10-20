@@ -1,6 +1,6 @@
 [
   {
-    "id": "06e0974e-611e-4e25-bc84-c4d85b878865",
+    "id": "1fd81acd-1e33-4c7e-aeba-39f74e240b64",
     "itens": [
       {
         "id": "p7",
@@ -23,8 +23,8 @@
     },
     "linkMapa": "https://www.google.com/maps/dir/?api=1&destination=-5.1265919,-42.774064",
     "cliente": {
-      "nome": "Kalil",
-      "telefone": "86981458975",
+      "nome": "Lula",
+      "telefone": "86912345678",
       "cep": "64031-220",
       "rua": "Rua Macedônia",
       "numero": "5507",
@@ -38,19 +38,15 @@
     },
     "formaPagamento": "dinheiro",
     "pagamentoDinheiro": {
-      "trocoPara": 15,
-      "troco": 4.24
+      "trocoPara": 11.8,
+      "troco": 1.04
     },
-    "status": "saiu_para_entrega",
-    "criadoEm": "2026-10-01T22:20:40.183Z",
+    "status": "pago",
+    "criadoEm": "2026-10-04T20:05:09.699Z",
     "telegram": {
       "cozinha": {
         "chatId": 8561914673,
-        "messageId": 79
-      },
-      "entrega": {
-        "chatId": 8561914673,
-        "messageId": 80
+        "messageId": 88
       }
     }
   }

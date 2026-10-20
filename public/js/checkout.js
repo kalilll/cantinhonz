@@ -219,8 +219,29 @@ campoTelefone.addEventListener("input", () => {
 // Opcional: só é ativado se o servidor tiver uma chave de navegador
 // configurada (GOOGLE_MAPS_BROWSER_KEY). Sem ela, o campo Rua continua um
 // texto comum — o cliente digita manualmente, com a ajuda do CEP acima.
+// Se o Google recusar a chave do navegador (API não habilitada, restrição de
+// domínio errada, faturamento etc.), o widget marca o campo com um ícone de
+// erro repetido ("!"). Aqui desligamos o autocomplete nesse caso, pra Rua
+// continuar funcionando como um campo de texto comum.
+function desativarPlacesAutocomplete() {
+  console.warn(
+    "[checkout] O Google Places não aceitou a chave do navegador (GOOGLE_MAPS_BROWSER_KEY). " +
+      "Sugestões de endereço desativadas; o campo Rua segue como texto comum."
+  );
+  const limpar = () => {
+    campoRua.classList.remove("gm-err-autocomplete");
+    document.querySelectorAll(".pac-container").forEach((el) => el.remove());
+  };
+  limpar();
+  setTimeout(limpar, 0);
+  window.google?.maps?.event?.clearInstanceListeners(campoRua);
+}
+
 function carregarPlacesAutocomplete(chave, coordenadasRestaurante) {
   if (!chave || window.google?.maps?.places) return;
+
+  // Chamado pelo próprio Google Maps JS quando a autenticação da chave falha.
+  window.gm_authFailure = desativarPlacesAutocomplete;
 
   window.iniciarAutocompleteEndereco = () => {
     const autocomplete = new google.maps.places.Autocomplete(campoRua, {
@@ -277,6 +298,7 @@ function carregarPlacesAutocomplete(chave, coordenadasRestaurante) {
   const script = document.createElement("script");
   script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(chave)}&libraries=places&language=pt-BR&region=BR&loading=async&callback=iniciarAutocompleteEndereco`;
   script.async = true;
+  script.onerror = desativarPlacesAutocomplete; // bloqueado por adblock/rede
   document.head.appendChild(script);
 }
 
